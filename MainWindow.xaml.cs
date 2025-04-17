@@ -941,5 +941,50 @@ namespace OVChecker
                 ShowApplicableChecks();
             }
         }
+
+        private void ButtonDownloadWheel_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrEmpty(TextWheelURL.Text))
+            {
+                MessageBox.Show("Please, enter a Wheel URL");
+                return;
+            }
+            string url = TextWheelURL.Text;
+            if(url.Length < 20 || url.Substring(0,4).ToLower() != "http" || url.Substring(url.Length-4).ToLower() != ".whl")
+            {
+                MessageBox.Show("Please, check URL correctness");
+                return;
+            }
+            string filename = System.IO.Path.GetFileName(url);
+            if (System.IO.File.Exists(WorkDir + filename) && MessageBox.Show("File "+filename+" exists, overwrite?", "Downloading Wheel", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+            {
+                return;
+            }
+            try
+            {
+                var httpClientHandler = new HttpClientHandler
+                {
+                    Proxy = null,
+                    UseProxy = false,
+                };
+                using (var client = new HttpClient(httpClientHandler, false))
+                {
+                    using (var s = client.GetStreamAsync(url))
+                    {
+                        using (var fs = new FileStream(WorkDir + filename, FileMode.OpenOrCreate))
+                        {
+                            s.Result.CopyTo(fs);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show("Download failed, please download file manually and store as " + filename + " in Work Dir");
+                return;
+            }
+            MessageBox.Show("Wheel has been downloaded!", "Download Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            SelectOrAddComboBoxItem(CBoxOpenVINOPath, WorkDir + filename);
+        }
     }
 }

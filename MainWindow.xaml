@@ -27,6 +27,9 @@
                         <Expander Header="OpenVINO" IsExpanded="True">
                             <Grid>
                                 <ComboBox x:Name="CBoxOpenVINOPath" Margin="10,10,10,0" VerticalAlignment="Top" SelectionChanged="CBoxOpenVINOPath_SelectionChanged"/>
+                                <Label Content="Download Wheel:" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.502,-0.233"/>
+                                <TextBox x:Name="TextWheelURL" Margin="113,41,123,0" TextWrapping="Wrap" VerticalAlignment="Top" ToolTip="Enter URL of Wheel to download into Work Dir"/>
+                                <Button x:Name="ButtonDownloadWheel" Content="Download" Margin="0,40,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.314,0.602" HorizontalAlignment="Right" Width="108" Click="ButtonDownloadWheel_Click"/>
                             </Grid>
                         </Expander>
                     </StackPanel>

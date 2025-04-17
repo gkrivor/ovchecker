@@ -880,6 +880,7 @@ namespace OVChecker
                 "pause\n" +
                 "del /q \"%~dp0\\*.exe\"\n" +
                 "del /q \"%~dp0\\*.dll\"\n" +
+                "del /q \"%~dp0\\*.config\"\n" +
                 "copy /y \"%~dp0\\Updates\\" + UpdateChecker.LatestVersion + "\\*\" \"%~dp0\\\"\n" +
                 "start OVChecker.exe\n");
             System.Diagnostics.Process.Start("cmd.exe", "/c \"" + app_path + "update.cmd\"");

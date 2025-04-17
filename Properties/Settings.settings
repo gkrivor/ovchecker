@@ -1,0 +1,39 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OVChecker.Properties" GeneratedClassName="Settings">
+	<Profiles />
+	<Settings>
+		<Setting Name="WorkDir" Type="System.String" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="WorkDirs" Type="System.Collections.Specialized.StringCollection" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="PythonPath" Type="System.String" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="PythonPaths" Type="System.Collections.Specialized.StringCollection" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="OpenVINOPath" Type="System.String" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="OpenVINOPaths" Type="System.Collections.Specialized.StringCollection" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="ModelPath" Type="System.String" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="ModelPaths" Type="System.Collections.Specialized.StringCollection" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+		<Setting Name="DarkSkin" Type="System.Boolean" Scope="User">
+			<Value Profile="(Default)">False</Value>
+		</Setting>
+		<Setting Name="UpdateURL" Type="System.String" Scope="User">
+			<Value Profile="(Default)"></Value>
+		</Setting>
+		<Setting Name="UpdateProxy" Type="System.String" Scope="User">
+			<Value Profile="(Default)" />
+		</Setting>
+	</Settings>
+</SettingsFile>

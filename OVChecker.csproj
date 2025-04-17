@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<VersionPrefix>1.0.1</VersionPrefix>
+		<ApplicationIcon>Resources\main.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\main.ico" />
+	  <None Remove="Resources\run.png" />
+	  <None Remove="Resources\run_m.png" />
+	  <None Remove="Resources\status_error.bmp" />
+	  <None Remove="Resources\status_ok.bmp" />
+	  <None Remove="Resources\status_unknown.bmp" />
+	  <None Remove="Resources\warning.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resources\main.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\main.ico" />
+	  <Resource Include="Resources\run.png" />
+	  <Resource Include="Resources\run_m.png" />
+	  <Resource Include="Resources\status_error.bmp" />
+	  <Resource Include="Resources\status_ok.bmp" />
+	  <Resource Include="Resources\status_unknown.bmp" />
+	  <Resource Include="Resources\warning.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\Settings.Designer.cs">
+	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Settings.settings</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Properties\Settings.settings">
+	    <Generator>SettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+	  </None>
+	</ItemGroup>
+
+</Project>

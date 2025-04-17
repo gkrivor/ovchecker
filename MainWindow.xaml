@@ -1,0 +1,127 @@
+﻿<Window x:Class="OVChecker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OVChecker"
+        mc:Ignorable="d"
+        Title="OV Checker" Height="600" Width="800" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+    <Grid>
+
+        <TabControl x:Name="TabTools" Margin="10,6,10,10" SelectionChanged="TabTools_SelectionChanged">
+            <TabItem Header="Environment" x:Name="TabEnv">
+                <Grid>
+                    <Label Content="Work dir:" HorizontalAlignment="Left" Height="27" Margin="10,6,0,0" VerticalAlignment="Top" Width="71"/>
+                    <ComboBox x:Name="CBoxWorkDir" Margin="86,10,226,0" Text="" Height="20" VerticalAlignment="Top" ToolTip="Work Directory is used for looking up for executables, collecting build artifacts, attempts history, etc..." SelectionChanged="CBoxWorkDir_SelectionChanged"/>
+                    <Button Content="Browse..." Margin="0,10,120,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="101" Click="ButtonWorkDirBrowse_Click"/>
+                    <Button Content="Open in Explorer" Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="105" Click="ButtonWorkDirOpen_Click"/>
+                    <StackPanel Orientation="Vertical" Margin="10,38,10,10">
+                        <Expander Header="Python" IsExpanded="True">
+                            <Grid>
+                                <ComboBox x:Name="CBoxPythonPath" Margin="10,10,10,0" VerticalAlignment="Top" SelectionChanged="CBoxPythonPath_SelectionChanged">
+                                    <ComboBoxItem>Browse...</ComboBoxItem>
+                                </ComboBox>
+                                <CheckBox x:Name="CBUseVenv" Content="Use venv" IsEnabled="False" Margin="10,46,0,20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="105" ToolTip="Use a virtual environment to execute python's commands" IsChecked="False"/>
+                            </Grid>
+                        </Expander>
+                        <Expander Header="OpenVINO" IsExpanded="True">
+                            <Grid>
+                                <ComboBox x:Name="CBoxOpenVINOPath" Margin="10,10,10,0" VerticalAlignment="Top" SelectionChanged="CBoxOpenVINOPath_SelectionChanged"/>
+                            </Grid>
+                        </Expander>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Model Checking" x:Name="TabChecks">
+                <Grid>
+                    <Label Content="Model:" HorizontalAlignment="Left" Height="27" Margin="10,6,0,0" VerticalAlignment="Top" Width="71"/>
+                    <ComboBox x:Name="CBoxModelPath" Margin="86,10,226,0" Text="" Height="20" VerticalAlignment="Top" ToolTip="Model path points on exact model" SelectionChanged="CBoxModelPath_SelectionChanged"/>
+                    <Button Content="Browse..." Margin="0,10,120,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="101" Click="ButtonBrowseModelPath_Click"/>
+                    <Button Content="Open folder..." Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="105" ToolTip="Opens model's folder in Windows Explorer" Click="ButtonOpenModelsFolder_Click"/>
+                    <ListView x:Name="ListViewChecks" Margin="0,63,258,49" Grid.RowSpan="2">
+                        <!--ListView.View>
+                            <GridView>
+                                <GridViewColumn/>
+                                <GridViewColumn/>
+                            </GridView>
+                        </ListView.View-->
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Selected}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Name">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Status">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <!--TextBlock Text="{Binding StatusIcon}"/-->
+                                            <Image Source="{Binding StatusIcon}" Width="16" Height="16"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Run">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Uid="{Binding GUID}" Click="ButtonSingleCheckRun_Click" ToolTip="Run only selected check">
+                                                <Image Source="Resources/run.png" Width="16" Height="16"/>
+                                            </Button>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                        <!--ListView.ItemTemplate>
+                            <DataTemplate>
+                                <WrapPanel>
+                                    <CheckBox IsChecked="{Binding Selected}" Margin="0,0,10,0"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                    <Image Source="{Binding Status}" Width="16" Height="16"/>
+                                </WrapPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate-->
+                    </ListView>
+                    <CheckBox x:Name="CBFastFail" Margin="10,0,0,7" Content="Fast Fail" ToolTip="Stop after a first failed command, run everything otherwise" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="71" Grid.Row="1"/>
+                    <Button HorizontalAlignment="Left" Margin="86,0,0,12" Click="ButtonRunSelected_Click" Height="20" VerticalAlignment="Bottom" Grid.Row="1">
+                        <WrapPanel>
+                            <Image Source="/Resources/run_m.png" Width="16" Height="16" Margin="0,0,6,0"/>
+                            <TextBlock Text="Run Selected"/>
+                        </WrapPanel>
+                    </Button>
+                    <Button Content="Select All" HorizontalAlignment="Left" Margin="10,38,0,0" Click="ButtonSelect_Click" Height="20" VerticalAlignment="Top" Width="64"/>
+                    <Button Content="Select None" HorizontalAlignment="Left" Margin="79,38,0,0" Click="ButtonSelect_Click" Height="20" VerticalAlignment="Top" Width="72" Uid="None"/>
+                    <Button Content="Reset status" HorizontalAlignment="Left" Margin="156,38,0,0" Click="ButtonSelect_Click" Height="20" VerticalAlignment="Top" Width="72" Uid="Status"/>
+                    <Label Content="Customizations:" Margin="0,35,159,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="94"/>
+                    <ListBox x:Name="ListChecksCustomizations" Margin="0,63,10,49" HorizontalAlignment="Right" Width="243" Grid.RowSpan="2"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="About">
+                <Grid>
+                    <Label Content="OV Checker" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="22" Margin="10,10,0,0"/>
+                    <Label x:Name="LabelVersion" Content="Version: 1.0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,49,0,0"/>
+                    <Label Content="Author: Krivoruchko, Georgy" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0"/>
+                    <Button x:Name="ButtonBugReport" Content="Report a bug" ToolTip="Opens default mail agent to report a bug" Margin="0,41,125,0" VerticalAlignment="Top" Uid="mailto:landgraph@gmail.com?subject=OV Checker" Click="LinkButton_Click" HorizontalAlignment="Right" Width="110"/>
+                    <Button x:Name="ButtonFeatureRequest" Content="Request a feature" ToolTip="Opens default mail agent to make a feature request" HorizontalAlignment="Right" Margin="0,41,10,0" VerticalAlignment="Top" Width="110"  Uid="mailto:landgraph@gmail.com?subject=OV Checker" Click="LinkButton_Click"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button x:Name="ButtonUpdate" Margin="0,6,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="96" ToolTip="New version is available, press button to update" Visibility="Hidden" Click="ButtonUpdate_Click">
+            <WrapPanel>
+                <Image Source="/Resources/warning.png" Width="16" Height="16" Margin="0,0,6,0"/>
+                <TextBlock Text="Update app"/>
+            </WrapPanel>
+        </Button>
+    </Grid>
+</Window>

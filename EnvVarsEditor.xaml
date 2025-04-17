@@ -1,0 +1,21 @@
+﻿<Window x:Class="OVChecker.EnvVarsEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OVChecker"
+        mc:Ignorable="d"
+        Title="Process Environment Variables" Height="596" Width="800" Loaded="Window_Loaded" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Label Content="System Environment Variables" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.941,-0.371"/>
+        <TextBox x:Name="SysEnvVars" Margin="10,36,10,358" TextWrapping="NoWrap" Text="" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" FontFamily="Courier New" FontSize="12"/>
+        <Label Content="Custom Environment Variables" HorizontalAlignment="Left" Margin="10,0,0,327" VerticalAlignment="Bottom"/>
+        <TextBox x:Name="CustomEnvVars" Height="90" Margin="10,0,10,237" TextWrapping="NoWrap" Text="" VerticalAlignment="Bottom" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" FontFamily="Courier New" FontSize="12" AcceptsReturn="True" AcceptsTab="True"/>
+        <Label Content="Resulting Environment Variables" HorizontalAlignment="Left" Margin="10,0,0,180" RenderTransformOrigin="-0.941,-0.371" Height="26" VerticalAlignment="Bottom"/>
+        <TextBox x:Name="ResEnvVars" Margin="10,0,10,10" TextWrapping="NoWrap" Text="" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" IsReadOnly="True" FontFamily="Courier New" FontSize="12" Height="170" VerticalAlignment="Bottom"/>
+        <Button Content="Test" x:Name="BtnApply" ToolTip="Tests to apply custom environment variables and shows it in Resultine EnvVars window" HorizontalAlignment="Left" Margin="10,0,0,212" VerticalAlignment="Bottom" Width="75" Click="BtnApply_Click"/>
+        <Button Content="Save" x:Name="BtnSave" HorizontalAlignment="Left" Margin="90,0,0,212" VerticalAlignment="Bottom" Width="75" Click="BtnSave_Click"/>
+        <Button Content="Python Env" x:Name="BtnPythonEnv" HorizontalAlignment="Center" Margin="0,0,0,212" Width="76" Click="BtnPythonEnv_Click" Height="20" VerticalAlignment="Bottom"/>
+        <Button Content="Close" x:Name="BtnClose" HorizontalAlignment="Right" Margin="0,0,10,212" VerticalAlignment="Bottom" Width="75" Click="BtnClose_Click"/>
+    </Grid>
+</Window>

@@ -1,0 +1,33 @@
+﻿<Window x:Class="OVChecker.AppOutput"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OVChecker"
+        mc:Ignorable="d"
+        Title="Process Output" Height="450" Width="800" Closing="Window_Closing">
+    <Grid>
+        <Menu>
+            <MenuItem Header="_Process">
+                <MenuItem x:Name="MnuKill" Header="_Kill..." Click="MnuKill_Click"/>
+                <MenuItem x:Name="MnuSave" Header="_Save output as text..." Click="MnuSave_Click"/>
+                <Separator/>
+                <MenuItem x:Name="MnuClose" Header="_Close" Click="MnuClose_Click"/>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem x:Name="MnuWordWrap" Header="_Word wrap" IsCheckable="True" IsChecked="True" Click="MnuWordWrap_Click"/>
+                <MenuItem x:Name="MnuAutoScroll" Header="_Auto Scroll" IsCheckable="True" IsChecked="True"/>
+                <MenuItem x:Name="MnuDarkSkin" Header="_Dark Skin" IsCheckable="True" IsChecked="False" Click="MnuDarkSkin_Click"/>
+                <Separator/>
+                <MenuItem x:Name="MnuFolders" Header="Working _folders..."/>
+            </MenuItem>
+        </Menu>
+        <TextBox x:Name="ProcessLog" TextWrapping="Wrap" Text="" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,22,0,32" VerticalAlignment="Stretch" IsReadOnly="True" IsReadOnlyCaretVisible="True" IsInactiveSelectionHighlightEnabled="True" FontFamily="Courier New" AcceptsTab="True" KeyDown="ProcessLog_KeyDown"/>
+        <ToolBar Height="32" VerticalAlignment="Bottom">
+            <Label Content="Search: "/>
+            <TextBox x:Name="TextSearch" Margin="0,2,0,3" Width="256" KeyUp="TextSearch_KeyUp"/>
+            <Button Content="Find" x:Name="BtnSearch" Click="BtnSearch_Click"/>
+            <Label Content="" x:Name="SearchResults"/>
+        </ToolBar>
+    </Grid>
+</Window>

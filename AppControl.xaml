@@ -1,0 +1,18 @@
+﻿<Window x:Class="OVChecker.AppControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OVChecker"
+        mc:Ignorable="d"
+        Title="Process Control" Height="250" Width="800" ResizeMode="NoResize">
+    <Grid>
+        <Label Content="Process Info" x:Name="LabelProcessInfo" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Label Content="Executable:" x:Name="LabelExecutable" Margin="10,41,10,0" VerticalAlignment="Top"/>
+        <Label Content="Initial Working dir:" x:Name="LabelWorkingDir" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" ToolTip="Double click to open folder" MouseDoubleClick="LabelWorkingDir_MouseDoubleClick" Cursor="Hand"/>
+        <Label Content="Arguments:" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="ExecutableArgs" Height="74" Margin="10,125,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" VerticalScrollBarVisibility="Visible" FontSize="10"/>
+        <Button Content="Kill Process" Margin="360,204,360,0" VerticalAlignment="Top" Click="Button_Click"/>
+
+    </Grid>
+</Window>

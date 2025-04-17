@@ -699,7 +699,7 @@ namespace OVChecker
                 string openvino_path = (CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!.Content.ToString()!;
                 if (openvino_path.ToLower().EndsWith(".whl"))
                 {
-                    tasks.Add(new() { Name = python_path, Args = "-m pip install --upgrade " + openvino_path, WorkingDir = WorkDir, NoWindow = true });
+                    tasks.Add(new() { Name = python_path, Args = "-m pip install --upgrade \"" + openvino_path + "\"", WorkingDir = WorkDir, NoWindow = true });
                 }
                 else
                 {
@@ -746,7 +746,7 @@ namespace OVChecker
 
             System.IO.File.WriteAllText(script_path, script);
 
-            tasks.Add(new() { Name = python_path, Args = script_path, WorkingDir = WorkDir, CustomEnvVars = custom_env, DontStopOnError = (CBFastFail.IsChecked == false), NoWindow = true, ItemSource = item, StatusHandler = ItemStatusHandler });
+            tasks.Add(new() { Name = python_path, Args = "\"" + script_path + "\"", WorkingDir = WorkDir, CustomEnvVars = custom_env, DontStopOnError = (CBFastFail.IsChecked == false), NoWindow = true, ItemSource = item, StatusHandler = ItemStatusHandler });
         }
         private void ButtonRunSelected_Click(object sender, RoutedEventArgs e)
         {

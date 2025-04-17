@@ -170,13 +170,6 @@ namespace OVChecker
                 SelectOrAddComboBoxItem(CBoxWorkDir, Properties.Settings.Default.WorkDir);
                 CBoxPythonPathReset();
             }
-            if (Properties.Settings.Default.OpenVINOPaths != null)
-            {
-                foreach (var item in Properties.Settings.Default.OpenVINOPaths)
-                {
-                    CBoxOpenVINOPath.Items.Add(new ComboBoxItem() { Content = item });
-                }
-            }
             if (Properties.Settings.Default.ModelPaths != null)
             {
                 foreach (var item in Properties.Settings.Default.ModelPaths)
@@ -443,6 +436,14 @@ namespace OVChecker
             CBoxOpenVINOPath.Items.Clear();
             CBoxOpenVINOPath.Items.Add(new ComboBoxBrowseItem() { Content = "Browse for a Bin folder..." });
             CBoxOpenVINOPath.Items.Add(new ComboBoxBrowseWheelItem() { Content = "Browse for a Wheel..." });
+            if (Properties.Settings.Default.OpenVINOPaths != null)
+            {
+                foreach (var item in Properties.Settings.Default.OpenVINOPaths)
+                {
+                    if (ComboBoxItemIndex(CBoxOpenVINOPath, item) >= 0) continue;
+                    CBoxOpenVINOPath.Items.Add(new ComboBoxItem() { Content = item });
+                }
+            }
             if (PythonPath.Length > 0)
             {
                 Process process = new Process();
@@ -484,7 +485,6 @@ namespace OVChecker
                 }
                 if (stored_path != "")
                 {
-                    CBoxOpenVINOPath.SelectedIndex = CBoxOpenVINOPath.Items.Add(new ComboBoxItem() { Content = stored_path });
                     OVPath = stored_path;
                 }
             }
@@ -648,7 +648,6 @@ namespace OVChecker
                         System.Windows.MessageBox.Show("Folder doesn't contain openvino.dll");
                         return;
                     }
-                    CBoxOpenVINOPath.SelectedIndex = CBoxOpenVINOPath.Items.Add(new ComboBoxItem() { Content = openDialog.SelectedPath });
                     OVPath = openDialog.SelectedPath;
                 }
             }
@@ -675,8 +674,12 @@ namespace OVChecker
                     CBoxOpenVINOPath.SelectedIndex = -1;
                     return;
                 }
-                CBoxOpenVINOPath.SelectedIndex = CBoxOpenVINOPath.Items.Add(new ComboBoxItem() { Content = openDialog.FileName });
                 OVPath = openDialog.FileName;
+            }
+            else
+            {
+                ComboBoxItem item = (CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!;
+                OVPath = item.Content.ToString()!;
             }
         }
 

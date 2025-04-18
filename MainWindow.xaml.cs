@@ -155,6 +155,7 @@ namespace OVChecker
         public MainWindow()
         {
             instance = this;
+            SplashScreen.ShowWindow();
             InitializeComponent();
             OVChecksRegistry.RegisterChecks();
             ListViewChecks.ItemsSource = OVChecks;
@@ -167,6 +168,7 @@ namespace OVChecker
             }
             if (Properties.Settings.Default.WorkDir != "")
             {
+                SplashScreen.SetStatus("Updating available OpenVINO versions...");
                 SelectOrAddComboBoxItem(CBoxWorkDir, Properties.Settings.Default.WorkDir);
                 CBoxPythonPathReset();
             }
@@ -185,6 +187,7 @@ namespace OVChecker
             ShowApplicableChecks();
             UpdateChecker.CheckUpdates();
             UpdateAboutTab();
+            SplashScreen.CloseWindow();
         }
         public void SaveCBoxWorkDirState()
         {
@@ -950,13 +953,13 @@ namespace OVChecker
                 return;
             }
             string url = TextWheelURL.Text;
-            if(url.Length < 20 || url.Substring(0,4).ToLower() != "http" || url.Substring(url.Length-4).ToLower() != ".whl")
+            if (url.Length < 20 || url.Substring(0, 4).ToLower() != "http" || url.Substring(url.Length - 4).ToLower() != ".whl")
             {
                 MessageBox.Show("Please, check URL correctness");
                 return;
             }
             string filename = System.IO.Path.GetFileName(url);
-            if (System.IO.File.Exists(WorkDir + filename) && MessageBox.Show("File "+filename+" exists, overwrite?", "Downloading Wheel", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+            if (System.IO.File.Exists(WorkDir + filename) && MessageBox.Show("File " + filename + " exists, overwrite?", "Downloading Wheel", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
             {
                 return;
             }

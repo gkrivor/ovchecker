@@ -374,6 +374,7 @@ namespace OVChecker
                 case ".onnx": ModelsFrontend = OVFrontends.ONNX; break;
                 case ".pb": ModelsFrontend = OVFrontends.TF; break;
                 case ".tflite": ModelsFrontend = OVFrontends.TFLite; break;
+                case ".xml": ModelsFrontend = OVFrontends.IR; break;
                 default: ModelsFrontend = OVFrontends.Any; break;
             }
         }
@@ -794,7 +795,7 @@ namespace OVChecker
 
         private void ButtonBrowseModelPath_Click(object sender, RoutedEventArgs e)
         {
-            string allKnownExts = "*.onnx; *.pb; *.pbtxt; *.meta; *.caffee; *.tflite";
+            string allKnownExts = "*.xml; *.onnx; *.pb; *.pbtxt; *.meta; *.caffee; *.tflite";
             System.Windows.Forms.OpenFileDialog openDialog = new()
             {
                 Filter = "Known models|" + allKnownExts + "|All files (*.*)|*.*",

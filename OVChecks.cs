@@ -14,6 +14,7 @@ namespace OVChecker
         TFLite = 2,
         TF = 3,
         Pytorch = 4,
+        IR = 5,
     }
     public enum CustomizationType
     {

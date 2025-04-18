@@ -171,6 +171,17 @@ namespace OVChecker
                 SplashScreen.SetStatus("Updating available OpenVINO versions...");
                 SelectOrAddComboBoxItem(CBoxWorkDir, Properties.Settings.Default.WorkDir);
                 CBoxPythonPathReset();
+            } else
+            {
+                string default_wd = AppDomain.CurrentDomain.BaseDirectory + "DefaultWorkDir";
+                if(!System.IO.Directory.Exists(default_wd))
+                {
+                    System.IO.Directory.CreateDirectory(default_wd);
+                }
+                if (System.IO.Directory.Exists(default_wd))
+                {
+                    WorkDir = default_wd;
+                }
             }
             if (Properties.Settings.Default.ModelPaths != null)
             {

@@ -130,6 +130,7 @@ namespace OVChecker
                                 try
                                 {
                                     System.IO.File.Delete(update_archive);
+                                    System.IO.Directory.Delete(update_path);
                                 }
                                 catch { }
                             }
@@ -151,6 +152,7 @@ namespace OVChecker
                                         try
                                         {
                                             System.IO.File.Delete(update_archive);
+                                            System.IO.Directory.Delete(update_path);
                                         }
                                         catch { }
                                     }

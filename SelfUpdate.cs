@@ -54,57 +54,68 @@ namespace OVChecker
         }
         private void CheckUpdatesThreadProc()
         {
-            try
+            bool first_attempt = true;
+            var httpClientHandler = new HttpClientHandler
             {
-                // Now create a client handler which uses that proxy
-                var httpClientHandler = new HttpClientHandler
-                {
-                    Proxy = null,
-                    UseProxy = false,
-                };
+                Proxy = null,
+                UseProxy = false,
+            };
 
-                if (Properties.Settings.Default.UpdateProxy != "")
-                {
-                    httpClientHandler.Proxy = new WebProxy(Properties.Settings.Default.UpdateProxy);
-                    httpClientHandler.UseProxy = true;
-                }
+            if (Properties.Settings.Default.UpdateProxy != "")
+            {
+                httpClientHandler.Proxy = new WebProxy(Properties.Settings.Default.UpdateProxy);
+                httpClientHandler.UseProxy = true;
+            }
 
-                using (var client = new HttpClient(httpClientHandler, false))
+            while (!IsCheckUpdatesCompleted)
+            {
+                if (!first_attempt)
+                    System.Threading.Thread.Sleep(30000);
+                else
+                    first_attempt = false;
+                try
                 {
-                    if (ThreadStop) return;
-                    using (var s = client.GetStreamAsync(Properties.Settings.Default.UpdateURL))
+                    using (var client = new HttpClient(httpClientHandler, false))
                     {
                         if (ThreadStop) return;
-                        using (var ms = new MemoryStream())
+                        using (var s = client.GetStreamAsync(Properties.Settings.Default.UpdateURL))
                         {
-                            s.Result.CopyTo(ms);
-                            ms.Seek(0, SeekOrigin.Begin);
-                            XmlDocument xml = new();
-                            xml.Load(ms);
-                            var doc = xml.DocumentElement;
-                            if (doc == null) return;
-                            var latest = doc.GetElementsByTagName("latest");
-                            if (latest != null && latest.Count > 0)
+                            if (ThreadStop) return;
+                            using (var ms = new MemoryStream())
                             {
-                                LatestVersion = new(latest[0]!.FirstChild!.Value!);
-                            }
-                            AvailableVersions.Clear();
-                            var available = doc.GetElementsByTagName("available");
-                            if (available != null && available.Count > 0)
-                            {
-                                foreach (var version in available[0]!.ChildNodes)
+                                s.Result.CopyTo(ms);
+                                ms.Seek(0, SeekOrigin.Begin);
+                                XmlDocument xml = new();
+                                xml.Load(ms);
+                                var doc = xml.DocumentElement;
+                                if (doc == null) continue;
+                                var latest = doc.GetElementsByTagName("latest");
+                                if (latest != null && latest.Count > 0)
                                 {
-                                    if (!(version is XmlElement)) continue;
-                                    var item = (version as XmlElement)!;
-                                    AvailableVersions[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[1]!.Value;
-                                    if (item.Attributes.Count > 2)
+                                    LatestVersion = new(latest[0]!.FirstChild!.Value!);
+                                }
+                                AvailableVersions.Clear();
+                                var available = doc.GetElementsByTagName("available");
+                                if (available != null && available.Count > 0)
+                                {
+                                    foreach (var version in available[0]!.ChildNodes)
                                     {
-                                        VersionsHash[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[2]!.Value.ToLowerInvariant();
+                                        if (!(version is XmlElement)) continue;
+                                        var item = (version as XmlElement)!;
+                                        AvailableVersions[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[1]!.Value;
+                                        if (item.Attributes.Count > 2)
+                                        {
+                                            VersionsHash[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[2]!.Value.ToLowerInvariant();
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                }
+                catch
+                {
+                    continue;
                 }
                 if (Assembly.GetExecutingAssembly().GetName().Version < LatestVersion)
                 {
@@ -120,7 +131,7 @@ namespace OVChecker
                         string update_path = updates_path + LatestVersion.ToString();
                         if (!AvailableVersions.ContainsKey(LatestVersion))
                         {
-                            return;
+                            continue;
                         }
                         string update_archive = update_path + ".zip";
                         if (System.IO.File.Exists(update_archive))
@@ -130,9 +141,12 @@ namespace OVChecker
                                 try
                                 {
                                     System.IO.File.Delete(update_archive);
-                                    System.IO.Directory.Delete(update_path);
+                                    System.IO.Directory.Delete(update_path, true);
                                 }
-                                catch { }
+                                catch
+                                {
+                                    continue;
+                                }
                             }
                         }
                         if (!System.IO.File.Exists(update_archive))
@@ -152,9 +166,12 @@ namespace OVChecker
                                         try
                                         {
                                             System.IO.File.Delete(update_archive);
-                                            System.IO.Directory.Delete(update_path);
+                                            System.IO.Directory.Delete(update_path, true);
                                         }
-                                        catch { }
+                                        catch
+                                        {
+                                            continue;
+                                        }
                                     }
                                 }
                             }
@@ -169,14 +186,13 @@ namespace OVChecker
                             MainWindow.instance.Dispatcher.Invoke(new(() => { if (MainWindow.instance != null) MainWindow.instance.ShowButtonUpdate(); }));
                         }
                     }
-                    catch { }
+                    catch
+                    {
+                        continue;
+                    }
                 }
+                IsCheckUpdatesCompleted = true;
             }
-            catch
-            {
-                return;
-            }
-            IsCheckUpdatesCompleted = true;
         }
     }
 }

@@ -22,6 +22,7 @@
                                     <ComboBoxItem>Browse...</ComboBoxItem>
                                 </ComboBox>
                                 <CheckBox x:Name="CBUseVenv" Content="Use venv" IsEnabled="False" Margin="10,46,0,20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="105" ToolTip="Use a virtual environment to execute python's commands" IsChecked="False"/>
+                                <CheckBox x:Name="CBPIPQuite" Content="Quite PIP tasks" Margin="100,46,0,20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="105" ToolTip="Run python -m pip with -q flag" IsChecked="True"/>
                             </Grid>
                         </Expander>
                         <Expander Header="OpenVINO" IsExpanded="True">

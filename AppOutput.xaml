@@ -15,14 +15,14 @@
                 <MenuItem x:Name="MnuClose" Header="_Close" Click="MnuClose_Click"/>
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem x:Name="MnuWordWrap" Header="_Word wrap" IsCheckable="True" IsChecked="True" Click="MnuWordWrap_Click"/>
+                <MenuItem x:Name="MnuWordWrap" Header="_Word wrap" IsCheckable="True" IsChecked="False" Click="MnuWordWrap_Click"/>
                 <MenuItem x:Name="MnuAutoScroll" Header="_Auto Scroll" IsCheckable="True" IsChecked="True"/>
                 <MenuItem x:Name="MnuDarkSkin" Header="_Dark Skin" IsCheckable="True" IsChecked="False" Click="MnuDarkSkin_Click"/>
                 <Separator/>
                 <MenuItem x:Name="MnuFolders" Header="Working _folders..."/>
             </MenuItem>
         </Menu>
-        <TextBox x:Name="ProcessLog" TextWrapping="Wrap" Text="" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,22,0,32" VerticalAlignment="Stretch" IsReadOnly="True" IsReadOnlyCaretVisible="True" IsInactiveSelectionHighlightEnabled="True" FontFamily="Courier New" AcceptsTab="True" KeyDown="ProcessLog_KeyDown"/>
+        <TextBox x:Name="ProcessLog" TextWrapping="NoWrap" Text="" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,22,0,32" VerticalAlignment="Stretch" IsReadOnly="True" IsReadOnlyCaretVisible="True" IsInactiveSelectionHighlightEnabled="True" FontFamily="Courier New" AcceptsTab="True" KeyDown="ProcessLog_KeyDown"/>
         <ToolBar Height="32" VerticalAlignment="Bottom">
             <Label Content="Search: "/>
             <TextBox x:Name="TextSearch" Margin="0,2,0,3" Width="256" KeyUp="TextSearch_KeyUp"/>

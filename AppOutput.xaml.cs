@@ -241,7 +241,8 @@ namespace OVChecker
             ProcessLog.Dispatcher.Invoke(
                 new Action(() =>
                 {
-                    ProcessLog.Text += outLine.Data + "\n";
+                    ProcessLog.BeginChange();
+                    ProcessLog.AppendText(outLine.Data + "\n");
                     if (MnuAutoScroll.IsChecked == true)
                     {
                         try
@@ -252,6 +253,7 @@ namespace OVChecker
                         catch
                         { }
                     }
+                    ProcessLog.EndChange();
                 }), System.Windows.Threading.DispatcherPriority.Input
             );
             if (outputLog != null)
@@ -265,7 +267,8 @@ namespace OVChecker
             ProcessLog.Dispatcher.Invoke(
                 new Action(() =>
                 {
-                    ProcessLog.Text += outLine + "\n";
+                    ProcessLog.BeginChange();
+                    ProcessLog.AppendText(outLine + "\n");
                     if (MnuAutoScroll.IsChecked == true)
                     {
                         try
@@ -276,6 +279,7 @@ namespace OVChecker
                         catch
                         { }
                     }
+                    ProcessLog.EndChange();
                 }), System.Windows.Threading.DispatcherPriority.Input
             );
             if (outputLog != null)

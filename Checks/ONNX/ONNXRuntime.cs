@@ -10,9 +10,10 @@ namespace OVChecker
             OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime vs OV output", "import numpy as np\n" +
                 "from onnxruntime import InferenceSession\n" +
                 "import openvino as ov\n" +
-                "sess = InferenceSession(\"%MODEL_PATH%\")\n" +
+                "m_path = \"%MODEL_PATH%\"\n" +
+                "sess = InferenceSession(m_path)\n" +
                 "ie = ov.Core()\n" +
-                "m = ie.read_model(\"%MODEL_PATH%\")\n" +
+                "m = ie.read_model(m_path)\n" +
                 "c = ie.compile_model(m, \"CPU\")\n" +
                 "ort_inputs = sess.get_inputs()\n" +
                 "ov_inputs = c.inputs\n" +
@@ -30,12 +31,13 @@ namespace OVChecker
                 "for i, item in enumerate(ort_inames):\n" +
                 "    if not item in ov_inames: raise Exception(f\"OpenVINO doesn't have input named {item}\")\n" +
                 "    if not item in ov_inputs[i].names: raise Exception(f\"OpenVINO has a wrong inputs order near {item}\")\n" +
-                "    if ort_inputs[i].shape != ov_inputs[i].shape: raise Exception(f\"Misalignment in shapes for {item} ONNXRuntime/OpenVINO: {ort_inputs[i].shape}/{ov_inputs[i].shape}\")\n" +
-                "    input_data[item] = np.random.randn(*(ort_inputs[i].shape)).astype(np.dtype(ov_inputs[i].get_element_type().to_dtype()))\n" +
+                "    if ov_inputs[i].get_partial_shape().is_static and ort_inputs[i].shape != ov_inputs[i].shape: raise Exception(f\"Misalignment in shapes for {item} ONNXRuntime/OpenVINO: {ort_inputs[i].shape}/{ov_inputs[i].shape}\")\n" +
+                "    shape = [1 if dim == -1 else dim.min_length for dim in ov_inputs[i].get_partial_shape()]\n" +
+                "    input_data[item] = np.random.randn(*shape).astype(np.dtype(ov_inputs[i].get_element_type().to_dtype()))\n" +
                 "for i, item in enumerate(ort_onames):\n" +
                 "    if not item in ov_onames: raise Exception(f\"OpenVINO doesn't have output named {item}\")\n" +
                 "    if not item in ov_outputs[i].names: raise Exception(f\"OpenVINO has a wrong outputs order near {item}\")\n" +
-                "    if ort_outputs[i].shape != ov_outputs[i].shape: raise Exception(f\"Misalignment in shapes for {item} ONNXRuntime/OpenVINO: {ort_outputs[i].shape}/{ov_outputs[i].shape}\")\n" +
+                "    if ov_outputs[i].get_partial_shape().is_static and ort_outputs[i].shape != ov_outputs[i].shape: raise Exception(f\"Misalignment in shapes for {item} ONNXRuntime/OpenVINO: {ort_outputs[i].shape}/{ov_outputs[i].shape}\")\n" +
                 "ort_results = sess.run(ort_onames, input_data)\n" +
                 "i = c.create_infer_request()\n" +
                 "ov_results = i.infer(input_data)\n" +

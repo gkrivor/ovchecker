@@ -85,10 +85,41 @@ namespace OVChecker
                     custom_env += "OV_ENABLE_VISUALIZE_TRACING=true\n";
             }
         };
+        static public OVCheckCustomization PrintResourceConsumptionCustomization = new()
+        {
+            Name = "Print OpenVINO mem consumption",
+            Group = "OpenVINO Debug",
+            Value = false,
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (bool.Parse(value!.ToString()!) != true) return;
+                const string keyword_bc = "# OnBeforeCheck";
+                var pos_bc = script.IndexOf(keyword_bc);
+                if (pos_bc == -1) { return; }
+                const string keyword_ac = "# OnAfterCheck";
+                var pos_ac = script.IndexOf(keyword_ac);
+                if (pos_ac == -1) { return; }
+
+                script = script.Insert(pos_bc, "if (not \"os\" in sys.modules) or (not \"os\" in dir()): import os\n" +
+                    "if not \"psutil\" in sys.modules: import psutil\n" +
+                    "mem_proc = psutil.Process(os.getpid())\n" +
+                    "mem_before = mem_proc.memory_info().rss\n");
+
+                string str = "\nmem_after = mem_proc.memory_info().rss\n" +
+                    "print(f\"Memory consumption: {mem_after - mem_before:,}\")\n";
+                pos_ac = script.IndexOf(keyword_ac);
+                if (pos_ac + keyword_ac.Length < script.Length)
+                    script = script.Insert(pos_ac + keyword_ac.Length + 1, str);
+                else
+                    script += str;
+            }
+        };
         static private void AddCustomizations(OVCheckDescription item)
         {
             item.Customizations.Add(PrintVersionCustomization);
             item.Customizations.Add(PauseBeforeCheckCustomization);
+            if (!item.Requirements.Contains("psutil")) item.Requirements += "psutil";
+            item.Customizations.Add(PrintResourceConsumptionCustomization);
             item.Customizations.Add(SerializeCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);
             item.Customizations.Add(EnableVisualizeTracingCustomization);
@@ -97,6 +128,8 @@ namespace OVChecker
         {
             item.Customizations.Add(PrintVersionCustomization);
             item.Customizations.Add(PauseBeforeCheckCustomization);
+            if (!item.Requirements.Contains("psutil")) item.Requirements += "psutil";
+            item.Customizations.Add(PrintResourceConsumptionCustomization);
             item.Customizations.Add(SerializeCustomization);
             item.Customizations.Add(CompilationDeviceCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);

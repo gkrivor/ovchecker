@@ -62,6 +62,17 @@ namespace OVChecker
                 SaveCBoxWorkDirState();
             }
         }
+        private bool IsCBoxPythonPathHasPath(string Path)
+        {
+            foreach (var cbitem in CBoxPythonPath.Items)
+            {
+                if (cbitem is ComboBoxDownloadItem && WorkDir + (cbitem as ComboBoxDownloadItem)!.Path + "\\python.exe" == Path)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         private string _PythonPath = "";
         public string PythonPath
         {
@@ -76,7 +87,10 @@ namespace OVChecker
                 }
                 if (_PythonPath == _value) return;
                 _PythonPath = _value;
-                SelectOrAddComboBoxItem(CBoxPythonPath, _value);
+                if (!IsCBoxPythonPathHasPath(_value))
+                {
+                    SelectOrAddComboBoxItem(CBoxPythonPath, _value);
+                }
                 CBoxOpenVINOPathReset();
                 Properties.Settings.Default.PythonPath = _value;
                 SaveCBoxPythonPathsState();
@@ -171,10 +185,11 @@ namespace OVChecker
                 SplashScreen.SetStatus("Updating available OpenVINO versions...");
                 SelectOrAddComboBoxItem(CBoxWorkDir, Properties.Settings.Default.WorkDir);
                 CBoxPythonPathReset();
-            } else
+            }
+            else
             {
                 string default_wd = AppDomain.CurrentDomain.BaseDirectory + "DefaultWorkDir";
-                if(!System.IO.Directory.Exists(default_wd))
+                if (!System.IO.Directory.Exists(default_wd))
                 {
                     System.IO.Directory.CreateDirectory(default_wd);
                 }
@@ -434,6 +449,7 @@ namespace OVChecker
             {
                 foreach (var item in Properties.Settings.Default.PythonPaths)
                 {
+                    if (IsCBoxPythonPathHasPath(item!)) continue;
                     InsertMissingComboBoxItem(CBoxPythonPath, item!);
                 }
             }

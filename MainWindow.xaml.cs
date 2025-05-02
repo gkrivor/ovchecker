@@ -665,10 +665,14 @@ namespace OVChecker
                 }
                 OVPath = openDialog.FileName;
             }
-            else
+            else if (CBoxOpenVINOPath.SelectedItem != null)
             {
                 ComboBoxItem item = (CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!;
                 OVPath = item.Content.ToString()!;
+            }
+            else
+            {
+                CBoxOpenVINOPath.SelectedIndex = -1;
             }
         }
 
@@ -680,7 +684,7 @@ namespace OVChecker
         private void PrepareEnvironment(List<AppOutput.ProcessItem> tasks, string python_path, ref string? custom_env)
         {
             string pip_flags = "";
-            if(CBPIPQuite.IsChecked == true)
+            if (CBPIPQuite.IsChecked == true)
             {
                 pip_flags = " -q";
             }
@@ -689,7 +693,7 @@ namespace OVChecker
                 var item = (CBoxOpenVINOPath.SelectedItem as ComboBoxOpenVINOItem)!;
                 tasks.Add(new() { Name = python_path, Args = "-m pip install --upgrade openvino==" + item.Version + pip_flags, WorkingDir = WorkDir, NoWindow = true });
             }
-            else// if(CBoxOpenVINOPath.SelectedItem is ComboBoxItem)
+            else if (CBoxOpenVINOPath.SelectedItem != null)
             {
                 tasks.Add(new() { Name = python_path, Args = "-m pip uninstall -y openvino" + pip_flags, WorkingDir = WorkDir, NoWindow = true });
                 tasks.Add(new() { Name = python_path, Args = "-m pip install numpy" + pip_flags, WorkingDir = WorkDir, NoWindow = true });

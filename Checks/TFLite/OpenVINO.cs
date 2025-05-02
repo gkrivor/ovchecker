@@ -14,7 +14,8 @@ namespace OVChecker
         }
         static public void Register()
         {
-            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.TFLite, "OpenVINO Frontend API Convert Partially", "import openvino as ov\n" +
+            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.TFLite, "OpenVINO Frontend API Convert Partially", "import sys\n" +
+                "import openvino as ov\n" +
                 "import openvino.frontend as of\n" +
                 "mngr = of.FrontEndManager()\n" +
                 "f = mngr.load_by_framework(\"tflite\")\n" +

@@ -4,10 +4,12 @@ namespace OVChecker
     {
         static public void Register()
         {
-            OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime Load model", "from onnxruntime import InferenceSession\n" +
+            OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime Load model", "import sys\n" +
+                "from onnxruntime import InferenceSession\n" +
                 "sess = InferenceSession(\"%MODEL_PATH%\")\n" +
                 "print(\">>> Done\")", "onnx onnxruntime");
-            OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime vs OV output", "import numpy as np\n" +
+            OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime vs OV output", "import sys\n" +
+                "import numpy as np\n" +
                 "from onnxruntime import InferenceSession\n" +
                 "import openvino as ov\n" +
                 "m_path = \"%MODEL_PATH%\"\n" +

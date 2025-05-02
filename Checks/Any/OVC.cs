@@ -26,7 +26,8 @@
         }
         static public void Register()
         {
-            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO OVC Convert model", "import openvino as ov\n" +
+            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO OVC Convert model", "import sys\n" +
+                "import openvino as ov\n" +
                 "import openvino.tools.ovc as ovc\n" +
                 "# OnBeforeCheck\n" +
                 "m = ovc.convert_model(\"%MODEL_PATH%\")\n" +

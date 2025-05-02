@@ -104,14 +104,16 @@ namespace OVChecker
         }
         static public void Register()
         {
-            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Read model", "import openvino as ov\n" +
+            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Read model", "import sys\n" +
+                "import openvino as ov\n" +
                 "ie = ov.Core()\n" +
                 "# OnBeforeCheck\n" +
                 "m = ie.read_model(\"%MODEL_PATH%\")\n" +
                 "# OnAfterCheck\n" +
                 "print(\">>> Done\")"
                 ));
-            AddCustomizations2(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Read model + Compile", "import openvino as ov\n" +
+            AddCustomizations2(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Read model + Compile", "import sys\n" +
+                "import openvino as ov\n" +
                 "ie = ov.Core()\n" +
                 "# OnBeforeCheck\n" +
                 "m = ie.read_model(\"%MODEL_PATH%\")\n" +
@@ -119,7 +121,8 @@ namespace OVChecker
                 "# OnAfterCheck\n" +
                 "print(\">>> Done\")"
                 ));
-            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Convert model", "import openvino as ov\n" +
+            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Convert model", "import sys\n" +
+                "import openvino as ov\n" +
                 "# OnBeforeCheck\n" +
                 "m = ov.convert_model(\"%MODEL_PATH%\")\n" +
                 "# OnAfterCheck\n" +

@@ -484,7 +484,7 @@ namespace OVChecker
             {
                 Process process = new Process();
                 process.StartInfo.FileName = PythonPath;
-                process.StartInfo.Arguments = "-m pip index versions openvino";
+                process.StartInfo.Arguments = "-m pip --disable-pip-version-check index versions openvino";
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
@@ -712,16 +712,16 @@ namespace OVChecker
             if (CBoxOpenVINOPath.SelectedItem is ComboBoxOpenVINOItem)
             {
                 var item = (CBoxOpenVINOPath.SelectedItem as ComboBoxOpenVINOItem)!;
-                tasks.Add(new() { Name = python_path, Args = "-m pip install --upgrade openvino==" + item.Version + pip_flags, WorkingDir = WorkDir, NoWindow = true });
+                tasks.Add(new() { Name = python_path, Args = "-m pip install --upgrade --disable-pip-version-check openvino==" + item.Version + pip_flags, WorkingDir = WorkDir, NoWindow = true });
             }
             else if (CBoxOpenVINOPath.SelectedItem != null)
             {
-                tasks.Add(new() { Name = python_path, Args = "-m pip uninstall -y openvino" + pip_flags, WorkingDir = WorkDir, NoWindow = true });
-                tasks.Add(new() { Name = python_path, Args = "-m pip install numpy" + pip_flags, WorkingDir = WorkDir, NoWindow = true });
+                tasks.Add(new() { Name = python_path, Args = "-m pip uninstall --disable-pip-version-check -y openvino" + pip_flags, WorkingDir = WorkDir, NoWindow = true });
+                tasks.Add(new() { Name = python_path, Args = "-m pip install --disable-pip-version-check numpy" + pip_flags, WorkingDir = WorkDir, NoWindow = true });
                 string openvino_path = (CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!.Content.ToString()!;
                 if (openvino_path.ToLower().EndsWith(".whl"))
                 {
-                    tasks.Add(new() { Name = python_path, Args = "-m pip install --upgrade \"" + openvino_path + "\"" + pip_flags, WorkingDir = WorkDir, NoWindow = true });
+                    tasks.Add(new() { Name = python_path, Args = "-m pip install --disable-pip-version-check --upgrade \"" + openvino_path + "\"" + pip_flags, WorkingDir = WorkDir, NoWindow = true });
                 }
                 else
                 {
@@ -738,7 +738,7 @@ namespace OVChecker
                 {
                     pip_flags = " -q";
                 }
-                tasks.Add(new() { Name = python_path, Args = "-m pip install --upgrade " + item.Requirements + pip_flags, WorkingDir = WorkDir, NoWindow = true });
+                tasks.Add(new() { Name = python_path, Args = "-m pip install --disable-pip-version-check --upgrade " + item.Requirements + pip_flags, WorkingDir = WorkDir, NoWindow = true });
             }
 
             string script_path = WorkDir + item.Name.Replace(" ", "_") + ".py";

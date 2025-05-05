@@ -111,18 +111,20 @@ namespace OVChecker
                     "mem_proc = psutil.Process(os.getpid())\n" +
                     "mem_1st = mem_proc.memory_info().rss\n" +
                     "mem_prev = mem_1st\n" +
-                    "print(f\"{'Line':<67}|{'Change':<16}|{'Total':<16}\")\n");
+                    "print(f\"{'Line':<67}|{'Change':<16}|{'Total':<16}\")\n" +
+                    "def mem_print(line):\n" +
+                    "  global mem_proc, mem_1st, mem_prev, mem_last\n" +
+                    "  mem_last = mem_proc.memory_info().rss\n" +
+                    "  print(f\"{line:<67}|{mem_last - mem_prev:<16,}|{mem_last - mem_1st:<16,}\")\n" +
+                    "  mem_prev = mem_last\n");
 
                 foreach (string line in check_lines)
                 {
                     string safe_line = line.Trim().Replace("\"", "\\\"");
-                    if (safe_line.Length == 0) continue;
+                    if (safe_line.Length == 0 || safe_line.Contains("no-check")) continue;
                     if (safe_line.Length > 64) safe_line = safe_line.Substring(0, 64) + "...";
                     script += line.EndsWith("\n") ? line : line + "\n";
-                    script += "mem_ln = \"" + safe_line + "\"\n" +
-                        "mem_last = mem_proc.memory_info().rss\n" +
-                        "print(f\"{mem_ln:<67}|{mem_last - mem_prev:<16,}|{mem_last - mem_1st:<16,}\")\n" +
-                        "mem_prev = mem_last\n";
+                    script += "mem_print(\"" + safe_line + "\") # no-check\n";
                 }
 
                 script += script_end;

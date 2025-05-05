@@ -175,7 +175,7 @@ namespace OVChecker
             if (tasks.Count <= 0) return;
 
             AppOutput app = new();
-            app.RunProcess("Checks", tasks, WorkDir + "latest.log");
+            app.RunProcess("Checks: " + ModelPath, tasks, WorkDir + "latest.log");
         }
 
         private void ItemStatusHandler(object? source, AppOutput.ProcessStatus status)
@@ -254,7 +254,7 @@ namespace OVChecker
             if (tasks.Count <= 0) return;
 
             AppOutput app = new();
-            app.RunProcess("Single Check", tasks, WorkDir + "latest.log");
+            app.RunProcess("Single Check: " + ModelPath, tasks, WorkDir + "latest.log");
         }
 
         private void ButtonOpenModelsFolder_Click(object sender, RoutedEventArgs e)

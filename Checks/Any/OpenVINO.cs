@@ -1,4 +1,5 @@
 ﻿using System.Windows.Markup;
+using System.Windows.Shapes;
 
 namespace OVChecker
 {
@@ -100,18 +101,31 @@ namespace OVChecker
                 var pos_ac = script.IndexOf(keyword_ac);
                 if (pos_ac == -1) { return; }
 
+                string script_end = script.Substring(pos_ac);
+                string[] check_lines = script.Substring(pos_bc + keyword_bc.Length, pos_ac - pos_bc - keyword_bc.Length).Split("\n");
+                script = script.Remove(pos_bc + keyword_bc.Length);
+                if (!script.EndsWith("\n")) script += "\n";
+
                 script = script.Insert(pos_bc, "if (not \"os\" in sys.modules) or (not \"os\" in dir()): import os\n" +
                     "if not \"psutil\" in sys.modules: import psutil\n" +
                     "mem_proc = psutil.Process(os.getpid())\n" +
-                    "mem_before = mem_proc.memory_info().rss\n");
+                    "mem_1st = mem_proc.memory_info().rss\n" +
+                    "mem_prev = mem_1st\n" +
+                    "print(f\"{'Line':<67}|{'Change':<16}|{'Total':<16}\")\n");
 
-                string str = "\nmem_after = mem_proc.memory_info().rss\n" +
-                    "print(f\"Memory consumption: {mem_after - mem_before:,}\")\n";
-                pos_ac = script.IndexOf(keyword_ac);
-                if (pos_ac + keyword_ac.Length < script.Length)
-                    script = script.Insert(pos_ac + keyword_ac.Length + 1, str);
-                else
-                    script += str;
+                foreach (string line in check_lines)
+                {
+                    string safe_line = line.Trim().Replace("\"", "\\\"");
+                    if (safe_line.Length == 0) continue;
+                    if (safe_line.Length > 64) safe_line = safe_line.Substring(0, 64) + "...";
+                    script += line.EndsWith("\n") ? line : line + "\n";
+                    script += "mem_ln = \"" + safe_line + "\"\n" +
+                        "mem_last = mem_proc.memory_info().rss\n" +
+                        "print(f\"{mem_ln:<67}|{mem_last - mem_prev:<16,}|{mem_last - mem_1st:<16,}\")\n" +
+                        "mem_prev = mem_last\n";
+                }
+
+                script += script_end;
             }
         };
         static private void AddCustomizations(OVCheckDescription item)

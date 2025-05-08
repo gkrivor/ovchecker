@@ -7,7 +7,7 @@ namespace OVChecker
             OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime Load model", "import sys\n" +
                 "from onnxruntime import InferenceSession\n" +
                 "sess = InferenceSession(\"%MODEL_PATH%\")\n" +
-                "print(\">>> Done\")", "onnx onnxruntime");
+                "print(\">>> Done\")", "onnxruntime");
             OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime vs OV output", "import sys\n" +
                 "import numpy as np\n" +
                 "from onnxruntime import InferenceSession\n" +
@@ -49,7 +49,7 @@ namespace OVChecker
                 "    print(f\"\\\"{ort_onames[i]}\\\" abs diff is {diff}\")\n" +
                 "    is_failed |= diff > 0.00001\n" +
                 "if is_failed == True: raise Exception(\"Diff for one of outputs more than 0.00001\")\n" +
-                "print(\">>> Done\")", "onnx onnxruntime");
+                "print(\">>> Done\")", "onnxruntime");
         }
     }
 }

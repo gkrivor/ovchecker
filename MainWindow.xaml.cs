@@ -20,6 +20,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Collections.Generic;
 using System;
+using System.Runtime.InteropServices;
 
 namespace OVChecker
 {
@@ -29,6 +30,7 @@ namespace OVChecker
     public partial class MainWindow : Window
     {
         public static MainWindow? instance;
+        public static string python_bin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "python.exe" : "python";
         public OVFrontends ModelsFrontend { get; set; } = OVFrontends.Any;
         public SelfUpdate UpdateChecker { get; set; } = new();
         public MainWindow()

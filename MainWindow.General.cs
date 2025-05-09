@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -48,7 +49,7 @@ namespace OVChecker
         {
             foreach (var cbitem in CBoxPythonPath.Items)
             {
-                if (cbitem is ComboBoxDownloadItem && WorkDir + (cbitem as ComboBoxDownloadItem)!.Path + "\\python.exe" == Path)
+                if (cbitem is ComboBoxDownloadItem && WorkDir + (cbitem as ComboBoxDownloadItem)!.Path + "\\" + python_bin == Path)
                 {
                     return true;
                 }
@@ -62,10 +63,10 @@ namespace OVChecker
             set
             {
                 string _value = value.Replace("/", "\\");
-                if (!_value.EndsWith("python.exe"))
+                if (!_value.EndsWith(python_bin))
                 {
                     if (!_value.EndsWith("\\")) _value += "\\";
-                    _value += "python.exe";
+                    _value += python_bin;
                 }
                 if (_PythonPath == _value) return;
                 _PythonPath = _value;
@@ -204,12 +205,15 @@ namespace OVChecker
             CBoxPythonPath.Items.Add(new ComboBoxBrowseItem() { Content = "Browse..." });
             if (CBoxWorkDir.Text.Length > 0)
             {
-                CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.13.3", URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-embed-amd64.zip", Path = "Python313" });
-                CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.12.10", URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip", Path = "Python312" });
-                CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.11.11", URL = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip", Path = "Python311" });
-                CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.10.11", URL = "https://www.python.org/ftp/python/3.10.11/python-3.10.11-embed-amd64.zip", Path = "Python310" });
-                CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.9.13", URL = "https://www.python.org/ftp/python/3.9.13/python-3.9.13-embed-amd64.zip", Path = "Python39" });
-                CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.8.10", URL = "https://www.python.org/ftp/python/3.8.10/python-3.8.10-embed-amd64.zip", Path = "Python38" });
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.13.3", URL = "https://www.python.org/ftp/python/3.13.3/python-3.13.3-embed-amd64.zip", Path = "Python313" });
+                    CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.12.10", URL = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip", Path = "Python312" });
+                    CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.11.11", URL = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip", Path = "Python311" });
+                    CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.10.11", URL = "https://www.python.org/ftp/python/3.10.11/python-3.10.11-embed-amd64.zip", Path = "Python310" });
+                    CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.9.13", URL = "https://www.python.org/ftp/python/3.9.13/python-3.9.13-embed-amd64.zip", Path = "Python39" });
+                    CBoxPythonPath.Items.Add(new ComboBoxDownloadItem() { Content = "Download Python 3.8.10", URL = "https://www.python.org/ftp/python/3.8.10/python-3.8.10-embed-amd64.zip", Path = "Python38" });
+                }
             }
             string stored_path = "";
             if (Properties.Settings.Default.PythonPath != "")
@@ -221,7 +225,7 @@ namespace OVChecker
                 if (item is ComboBoxDownloadItem && System.IO.Directory.Exists(WorkDir + "\\" + (item as ComboBoxDownloadItem)!.Path))
                 {
                     item.Content = item.Content.ToString()!.Replace("Download ", "");
-                    if (WorkDir + (item as ComboBoxDownloadItem)!.Path + "\\python.exe" == stored_path)
+                    if (WorkDir + (item as ComboBoxDownloadItem)!.Path + "\\" + python_bin == stored_path)
                     {
                         CBoxPythonPath.SelectedItem = item;
                         stored_path = "";
@@ -325,13 +329,13 @@ namespace OVChecker
 
                 if ((result = openDialog.ShowDialog()) == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(openDialog.SelectedPath))
                 {
-                    if (!System.IO.File.Exists(openDialog.SelectedPath + "\\python.exe"))
+                    if (!System.IO.File.Exists(openDialog.SelectedPath + "\\" + python_bin))
                     {
-                        System.Windows.MessageBox.Show("Folder doesn't contain python.exe");
+                        System.Windows.MessageBox.Show("Folder doesn't contain " + python_bin);
                         return;
                     }
                     CBoxPythonPath.SelectedIndex = CBoxPythonPath.Items.Add(new ComboBoxItem() { Content = openDialog.SelectedPath });
-                    PythonPath = openDialog.SelectedPath + "\\python.exe";
+                    PythonPath = openDialog.SelectedPath + "\\" + python_bin;
                 }
             }
             else if (CBoxPythonPath.SelectedItem is ComboBoxDownloadItem)
@@ -367,7 +371,7 @@ namespace OVChecker
                     if (System.IO.File.Exists(pip_archive) && !System.IO.Directory.Exists(python_path + "\\Lib\\site-packages\\pip"))
                     {
                         AppOutput appOutput = new();
-                        string ExeName = python_path + "\\python.exe";
+                        string ExeName = python_path + "\\" + python_bin;
                         appOutput.RunProcess("PIP Install", ExeName, pip_archive + " install pip", python_path);
                         while (!appOutput.IsWorkflowFinished)
                         {

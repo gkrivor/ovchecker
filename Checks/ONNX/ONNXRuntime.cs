@@ -2,13 +2,17 @@ namespace OVChecker
 {
     static public class ONNXRuntimeChecks
     {
+        static private void AddCustomizations(OVCheckDescription item)
+        {
+            item.Customizations.Add(CommonOpenVINOChecks.CompilationDeviceCustomization);
+        }
         static public void Register()
         {
             OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime Load model", "import sys\n" +
                 "from onnxruntime import InferenceSession\n" +
                 "sess = InferenceSession(\"%MODEL_PATH%\")\n" +
                 "print(\">>> Done\")", "onnxruntime");
-            OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime vs OV output", "import sys\n" +
+            AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "ONNXRuntime vs OV output", "import sys\n" +
                 "import numpy as np\n" +
                 "from onnxruntime import InferenceSession\n" +
                 "import openvino as ov\n" +
@@ -16,7 +20,7 @@ namespace OVChecker
                 "sess = InferenceSession(m_path)\n" +
                 "ie = ov.Core()\n" +
                 "m = ie.read_model(m_path)\n" +
-                "c = ie.compile_model(m, \"CPU\")\n" +
+                "c = ie.compile_model(m, \"%DEVICE%\")\n" +
                 "ort_inputs = sess.get_inputs()\n" +
                 "ov_inputs = c.inputs\n" +
                 "if (len(ort_inputs) != len(c.inputs)): raise Exception(f\"Misalignment in inputs ONNXRuntime/OpenVINO: {len(ort_inputs)}/{len(ov_inputs)}\")\n" +
@@ -49,7 +53,7 @@ namespace OVChecker
                 "    print(f\"\\\"{ort_onames[i]}\\\" abs diff is {diff}\")\n" +
                 "    is_failed |= diff > 0.00001\n" +
                 "if is_failed == True: raise Exception(\"Diff for one of outputs more than 0.00001\")\n" +
-                "print(\">>> Done\")", "onnxruntime");
+                "print(\">>> Done\")", "onnxruntime"));
         }
     }
 }

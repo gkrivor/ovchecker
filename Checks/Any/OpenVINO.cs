@@ -130,6 +130,30 @@ namespace OVChecker
                 script += script_end;
             }
         };
+        static public OVCheckCustomization EnableMatcherLoggingCustomization = new()
+        {
+            Name = "Enable OpenVINO Matcher Logging",
+            Group = "OpenVINO Debug",
+            Value = false,
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (bool.Parse(value!.ToString()!) != true) return;
+                if (!custom_env.Contains("OV_MATCHER_LOGGING"))
+                    custom_env += "OV_MATCHER_LOGGING=true\n";
+            }
+        };
+        static public OVCheckCustomization SpecifyMatcherLoggingCustomization = new()
+        {
+            Name = "Specify Matcher Logging Transformation",
+            Group = "OpenVINO Debug",
+            Value = "",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (!(value is string) || value.ToString() == "") return;
+                if (!custom_env.Contains("OV_MATCHERS_TO_LOG"))
+                    custom_env += "OV_MATCHERS_TO_LOG=" + value!.ToString() + "\n";
+            }
+        };
         static private void AddCustomizations(OVCheckDescription item)
         {
             item.Customizations.Add(PrintVersionCustomization);
@@ -139,6 +163,8 @@ namespace OVChecker
             item.Customizations.Add(SerializeCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);
             item.Customizations.Add(EnableVisualizeTracingCustomization);
+            item.Customizations.Add(EnableMatcherLoggingCustomization);
+            item.Customizations.Add(SpecifyMatcherLoggingCustomization);
         }
         static private void AddCustomizations2(OVCheckDescription item)
         {
@@ -150,6 +176,8 @@ namespace OVChecker
             item.Customizations.Add(CompilationDeviceCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);
             item.Customizations.Add(EnableVisualizeTracingCustomization);
+            item.Customizations.Add(EnableMatcherLoggingCustomization);
+            item.Customizations.Add(SpecifyMatcherLoggingCustomization);
         }
         static public void Register()
         {

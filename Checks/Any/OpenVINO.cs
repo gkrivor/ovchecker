@@ -166,12 +166,27 @@ namespace OVChecker
                     custom_env += "OV_VERBOSE_LOGGING=true\n";
             }
         };
+        static public OVCheckCustomization EnableGPUDumpMemoryPoolCustomization = new()
+        {
+            Name = "Enable GPU Dump Memory Pool",
+            Group = "OpenVINO Debug",
+            Value = false,
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (bool.Parse(value!.ToString()!) != true) return;
+                if (!custom_env.Contains("OV_VERBOSE"))
+                    custom_env += "OV_VERBOSE=4\n";
+                if (!custom_env.Contains("OV_GPU_DUMP_MEMORY_POOL"))
+                    custom_env += "OV_GPU_DUMP_MEMORY_POOL=1\n";
+            }
+        };
         static private void AddCustomizations(OVCheckDescription item)
         {
             item.Customizations.Add(PrintVersionCustomization);
             item.Customizations.Add(PauseBeforeCheckCustomization);
             if (!item.Requirements.Contains("psutil")) item.Requirements += "psutil";
             item.Customizations.Add(PrintResourceConsumptionCustomization);
+            item.Customizations.Add(EnableGPUDumpMemoryPoolCustomization);
             item.Customizations.Add(SerializeCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);
             item.Customizations.Add(EnableVisualizeTracingCustomization);
@@ -185,6 +200,7 @@ namespace OVChecker
             item.Customizations.Add(PauseBeforeCheckCustomization);
             if (!item.Requirements.Contains("psutil")) item.Requirements += "psutil";
             item.Customizations.Add(PrintResourceConsumptionCustomization);
+            item.Customizations.Add(EnableGPUDumpMemoryPoolCustomization);
             item.Customizations.Add(SerializeCustomization);
             item.Customizations.Add(CompilationDeviceCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);

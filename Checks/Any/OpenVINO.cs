@@ -154,6 +154,18 @@ namespace OVChecker
                     custom_env += "OV_MATCHERS_TO_LOG=" + value!.ToString() + "\n";
             }
         };
+        static public OVCheckCustomization EnableTransformationsVerboseLoggingCustomization = new()
+        {
+            Name = "Enable Transformations Verbose Logging",
+            Group = "OpenVINO Debug",
+            Value = false,
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (bool.Parse(value!.ToString()!) != true) return;
+                if (!custom_env.Contains("OV_VERBOSE_LOGGING"))
+                    custom_env += "OV_VERBOSE_LOGGING=true\n";
+            }
+        };
         static private void AddCustomizations(OVCheckDescription item)
         {
             item.Customizations.Add(PrintVersionCustomization);
@@ -165,6 +177,7 @@ namespace OVChecker
             item.Customizations.Add(EnableVisualizeTracingCustomization);
             item.Customizations.Add(EnableMatcherLoggingCustomization);
             item.Customizations.Add(SpecifyMatcherLoggingCustomization);
+            item.Customizations.Add(EnableTransformationsVerboseLoggingCustomization);
         }
         static private void AddCustomizations2(OVCheckDescription item)
         {
@@ -178,6 +191,7 @@ namespace OVChecker
             item.Customizations.Add(EnableVisualizeTracingCustomization);
             item.Customizations.Add(EnableMatcherLoggingCustomization);
             item.Customizations.Add(SpecifyMatcherLoggingCustomization);
+            item.Customizations.Add(EnableTransformationsVerboseLoggingCustomization);
         }
         static public void Register()
         {

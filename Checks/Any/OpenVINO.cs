@@ -153,7 +153,7 @@ namespace OVChecker
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (!(value is string) || value.ToString() == "") return;
-                AddEnvironmentVariable(ref script, "OV_MATCHER_LOGGING", "\"" + value!.ToString() + "\"");
+                AddEnvironmentVariable(ref script, "OV_MATCHERS_TO_LOG", "\"" + value!.ToString() + "\"");
             }
         };
         static public OVCheckCustomization EnableTransformationsVerboseLoggingCustomization = new()

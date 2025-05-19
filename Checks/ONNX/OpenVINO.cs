@@ -15,6 +15,7 @@ namespace OVChecker
         static public void Register()
         {
             AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.ONNX, "OpenVINO Frontend API Convert Partially", "import sys\n" +
+                "import os\n" +
                 "import openvino as ov\n" +
                 "import openvino.frontend as of\n" +
                 "mngr = of.FrontEndManager()\n" +

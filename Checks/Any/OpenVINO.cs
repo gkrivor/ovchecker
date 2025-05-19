@@ -106,8 +106,7 @@ namespace OVChecker
                 script = script.Remove(pos_bc + keyword_bc.Length);
                 if (!script.EndsWith("\n")) script += "\n";
 
-                script = script.Insert(pos_bc, "if (not \"os\" in sys.modules) or (not \"os\" in dir()): import os\n" +
-                    "if not \"psutil\" in sys.modules: import psutil\n" +
+                script = script.Insert(pos_bc, "if not \"psutil\" in sys.modules: import psutil\n" +
                     "mem_proc = psutil.Process(os.getpid())\n" +
                     "mem_1st = mem_proc.memory_info().rss\n" +
                     "mem_prev = mem_1st\n" +
@@ -212,6 +211,7 @@ namespace OVChecker
         static public void Register()
         {
             AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Read model", "import sys\n" +
+                "import os\n" +
                 "import openvino as ov\n" +
                 "ie = ov.Core()\n" +
                 "# OnBeforeCheck\n" +
@@ -220,6 +220,7 @@ namespace OVChecker
                 "print(\">>> Done\")"
                 ));
             AddCustomizations2(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Read model + Compile", "import sys\n" +
+                "import os\n" +
                 "import openvino as ov\n" +
                 "ie = ov.Core()\n" +
                 "# OnBeforeCheck\n" +
@@ -229,6 +230,7 @@ namespace OVChecker
                 "print(\">>> Done\")"
                 ));
             AddCustomizations(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Convert model", "import sys\n" +
+                "import os\n" +
                 "import openvino as ov\n" +
                 "# OnBeforeCheck\n" +
                 "m = ov.convert_model(\"%MODEL_PATH%\")\n" +

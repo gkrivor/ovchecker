@@ -5,6 +5,13 @@ namespace OVChecker
 {
     static public class CommonOpenVINOChecks
     {
+        static public void AddEnvironmentVariable(ref string script, string name, string value)
+        {
+            const string keyword = "import os\n";
+            var pos = script.IndexOf(keyword);
+            if (pos == -1) { return; }
+            script = script.Insert(pos + keyword.Length, "os.environ[\"" + name + "\"] = " + value + "\n");
+        }
         static public OVCheckCustomization PrintVersionCustomization = new()
         {
             Name = "Print OpenVINO version",
@@ -70,8 +77,9 @@ namespace OVChecker
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
-                if (!custom_env.Contains("OV_ENABLE_PROFILE_PASS"))
-                    custom_env += "OV_ENABLE_PROFILE_PASS=true\n";
+                AddEnvironmentVariable(ref script, "OV_ENABLE_PROFILE_PASS", "\"true\"");
+                //                if (!custom_env.Contains("OV_ENABLE_PROFILE_PASS"))
+                //                    custom_env += "OV_ENABLE_PROFILE_PASS=true\n";
             }
         };
         static public OVCheckCustomization EnableVisualizeTracingCustomization = new()
@@ -82,8 +90,9 @@ namespace OVChecker
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
-                if (!custom_env.Contains("OV_ENABLE_VISUALIZE_TRACING"))
-                    custom_env += "OV_ENABLE_VISUALIZE_TRACING=true\n";
+                AddEnvironmentVariable(ref script, "OV_ENABLE_VISUALIZE_TRACING", "\"true\"");
+                //                if (!custom_env.Contains("OV_ENABLE_VISUALIZE_TRACING"))
+                //                    custom_env += "OV_ENABLE_VISUALIZE_TRACING=true\n";
             }
         };
         static public OVCheckCustomization PrintResourceConsumptionCustomization = new()
@@ -137,8 +146,9 @@ namespace OVChecker
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
-                if (!custom_env.Contains("OV_MATCHER_LOGGING"))
-                    custom_env += "OV_MATCHER_LOGGING=true\n";
+                AddEnvironmentVariable(ref script, "OV_MATCHER_LOGGING", "\"true\"");
+                //                if (!custom_env.Contains("OV_MATCHER_LOGGING"))
+                //                    custom_env += "OV_MATCHER_LOGGING=true\n";
             }
         };
         static public OVCheckCustomization SpecifyMatcherLoggingCustomization = new()
@@ -149,8 +159,9 @@ namespace OVChecker
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (!(value is string) || value.ToString() == "") return;
-                if (!custom_env.Contains("OV_MATCHERS_TO_LOG"))
-                    custom_env += "OV_MATCHERS_TO_LOG=" + value!.ToString() + "\n";
+                AddEnvironmentVariable(ref script, "OV_MATCHER_LOGGING", "\"" + value!.ToString() + "\"");
+                //                if (!custom_env.Contains("OV_MATCHERS_TO_LOG"))
+                //                    custom_env += "OV_MATCHERS_TO_LOG=" + value!.ToString() + "\n";
             }
         };
         static public OVCheckCustomization EnableTransformationsVerboseLoggingCustomization = new()
@@ -161,8 +172,9 @@ namespace OVChecker
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
-                if (!custom_env.Contains("OV_VERBOSE_LOGGING"))
-                    custom_env += "OV_VERBOSE_LOGGING=true\n";
+                AddEnvironmentVariable(ref script, "OV_VERBOSE_LOGGING", "\"true\"");
+                //                if (!custom_env.Contains("OV_VERBOSE_LOGGING"))
+                //                    custom_env += "OV_VERBOSE_LOGGING=true\n";
             }
         };
         static public OVCheckCustomization EnableGPUDumpMemoryPoolCustomization = new()
@@ -173,10 +185,12 @@ namespace OVChecker
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
-                if (!custom_env.Contains("OV_VERBOSE"))
-                    custom_env += "OV_VERBOSE=4\n";
-                if (!custom_env.Contains("OV_GPU_DUMP_MEMORY_POOL"))
-                    custom_env += "OV_GPU_DUMP_MEMORY_POOL=1\n";
+                AddEnvironmentVariable(ref script, "OV_VERBOSE", "\"4\"");
+                AddEnvironmentVariable(ref script, "OV_GPU_DUMP_MEMORY_POOL", "\"1\"");
+                //                if (!custom_env.Contains("OV_VERBOSE"))
+                //                    custom_env += "OV_VERBOSE=4\n";
+                //                if (!custom_env.Contains("OV_GPU_DUMP_MEMORY_POOL"))
+                //                    custom_env += "OV_GPU_DUMP_MEMORY_POOL=1\n";
             }
         };
         static private void AddCustomizations(OVCheckDescription item)

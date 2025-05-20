@@ -264,11 +264,11 @@ namespace OVChecker
             if (string.IsNullOrEmpty(ModelPath)) { return; }
             if (System.IO.File.Exists(ModelPath))
             {
-                System.Diagnostics.Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(ModelPath)!);
+                System.Diagnostics.Process.Start("explorer.exe", "/select,\"" +ModelPath.Replace("\"", "\\\"") + "\"");
             }
             else if (System.IO.Directory.Exists(ModelPath))
             {
-                System.Diagnostics.Process.Start("explorer.exe", ModelPath);
+                System.Diagnostics.Process.Start("explorer.exe", "\""+ModelPath.Replace("\"", "\\\"") + "\"");
             }
         }
 

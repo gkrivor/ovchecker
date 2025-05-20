@@ -282,72 +282,56 @@ namespace OVChecker
         {
             if (string.IsNullOrEmpty(outLine.Data)) return;
             long cur_time = Environment.TickCount;
-            long update_speed = OutputLogLength > 1024 * 1024 ? 10000 : 1000;
-            if (!OutputLogOverflow)
+            long update_speed = OutputLogLength > 1024 * 1024 ? 2000 : 100;
+            long diff = cur_time - LastOutputFlush;
+            if ((diff > update_speed || OutputBuf.Length + outLine.Data.Length + 1 > OutputBufCapacity) && OutputBuf.Length > 0)
             {
-                long diff = cur_time - LastOutputFlush;
-                if ((diff > update_speed || OutputBuf.Length + outLine.Data.Length + 1 > OutputBufCapacity) && OutputBuf.Length > 0)
-                {
-                    string show_data = OutputBuf.ToString();
-                    OutputLogLength += OutputBuf.Length;
-                    OutputBuf.Clear();
-                    ProcessLog.Dispatcher.Invoke(
-                        new Action(() =>
-                        {
-                            ProcessLog.BeginChange();
-                            ProcessLog.AppendText(show_data);
-                            show_data = string.Empty;
-                            if (MnuAutoScroll.IsChecked == true)
-                            {
-                                try
-                                {
-                                    ProcessLog.CaretIndex = ProcessLog.Text.Length;
-                                    ProcessLog.ScrollToEnd();
-                                }
-                                catch
-                                { }
-                            }
-                            ProcessLog.EndChange();
-                        }), System.Windows.Threading.DispatcherPriority.Input
-                    );
-                    if (cur_time - LastOutputFlush > 1000)
+                string show_data = OutputBuf.ToString();
+                OutputLogLength += OutputBuf.Length;
+                OutputBuf.Clear();
+                ProcessLog.Dispatcher.Invoke(
+                    new Action(() =>
                     {
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                    }
-                    LastOutputFlush = cur_time;
-                }
-                OutputBuf.Append(outLine.Data);
-                OutputBuf.Append("\n");
-                if (OutputLogLength + outLine.Data.Length > OutputLogCapacity)
-                {
-                    OutputLogOverflow = true;
-                    ProcessLog.Dispatcher.Invoke(
-                        new Action(() =>
+                        ProcessLog.BeginChange();
+                        if (ProcessLog.Text.Length < OutputBufCapacity)
                         {
-                            ProcessLog.BeginChange();
-                            ProcessLog.AppendText("Task log is more than " + ((OutputLogCapacity + 1024 * 1024 - 1) / (1024 * 1024)) + "Mb and cannot be effectively displayed\n");
+                            ProcessLog.AppendText(show_data);
+                        }
+                        else
+                        {
+                            ProcessLog.Text = show_data;
+                            ProcessLog.AppendText("\nTask log has " + ((OutputLogLength + 1024 * 1024 - 1) / (1024 * 1024)) + "Mb of captured data and cannot be effectively displayed\n");
+                            ProcessLog.AppendText("Displayed only last " + ((ProcessLog.Text.Length + 1024 * 1024 - 1) / (1024 * 1024)) + "Mb\n");
                             if (outputLog != null)
                             {
                                 ProcessLog.AppendText("Please, use an external application to view stored log:\n");
                                 ProcessLog.AppendText(OutputLogPath);
                             }
-                            ProcessLog.AppendText("\n\nTask continues execution...\n");
-                            if (MnuAutoScroll.IsChecked == true)
+                            ProcessLog.AppendText("\n\nTask continues execution...");
+                        }
+                        show_data = string.Empty;
+                        if (MnuAutoScroll.IsChecked == true)
+                        {
+                            try
                             {
-                                try
-                                {
-                                    ProcessLog.CaretIndex = ProcessLog.Text.Length;
-                                    ProcessLog.ScrollToEnd();
-                                }
-                                catch
-                                { }
+                                ProcessLog.CaretIndex = ProcessLog.Text.Length;
+                                ProcessLog.ScrollToEnd();
                             }
-                            ProcessLog.EndChange();
-                        }), System.Windows.Threading.DispatcherPriority.Input
-                    );
+                            catch
+                            { }
+                        }
+                        ProcessLog.EndChange();
+                    }), System.Windows.Threading.DispatcherPriority.Background
+                );
+                if (cur_time - LastOutputFlush > 10000)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
+                LastOutputFlush = cur_time;
             }
+            OutputBuf.Append(outLine.Data);
+            OutputBuf.Append("\n");
 
             if (outputLog != null)
             {
@@ -358,7 +342,7 @@ namespace OVChecker
         private void OutputHandler(string outLine)
         {
             long cur_time = Environment.TickCount;
-            if ((cur_time - LastOutputFlush > 1000 || OutputBuf.Length + outLine.Length + 1 > OutputBufCapacity) && OutputBuf.Length > 0)
+            if ((cur_time - LastOutputFlush > 100 || OutputBuf.Length + outLine.Length + 1 > OutputBufCapacity) && OutputBuf.Length > 0)
             {
                 string show_data = OutputBuf.ToString();
                 OutputLogLength += OutputBuf.Length;
@@ -367,7 +351,14 @@ namespace OVChecker
                 new Action(() =>
                 {
                     ProcessLog.BeginChange();
-                    ProcessLog.AppendText(show_data);
+                    if (ProcessLog.Text.Length < OutputBufCapacity)
+                    {
+                        ProcessLog.AppendText(show_data);
+                    }
+                    else
+                    {
+                        ProcessLog.Text = show_data;
+                    }
                     if (MnuAutoScroll.IsChecked == true)
                     {
                         try
@@ -379,13 +370,12 @@ namespace OVChecker
                         { }
                     }
                     ProcessLog.EndChange();
-                }), System.Windows.Threading.DispatcherPriority.Input
+                }), System.Windows.Threading.DispatcherPriority.Background
                 );
                 LastOutputFlush = cur_time;
             }
             OutputBuf.Append(outLine);
             OutputBuf.Append("\n");
-            GC.Collect();
             if (outputLog != null)
             {
                 outputLog.WriteLine(outLine);

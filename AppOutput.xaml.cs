@@ -88,6 +88,14 @@ namespace OVChecker
                     MnuFolders.Items.Add(mnuItem);
                     ListedFolders.Add(item.WorkingDir);
                 }
+                if (OutputFileName != null)
+                {
+                    BtnOpenLogFolder.Uid = OutputFileName;
+                }
+                else
+                {
+                    BtnOpenLogFolder.Visibility = Visibility.Hidden;
+                }
                 Show();
             });
         }
@@ -519,6 +527,12 @@ namespace OVChecker
             ProcessLog.Text = "";
             GC.Collect();
             GC.WaitForPendingFinalizers();
+        }
+
+        private void BtnOpenLogFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button)) { return; }
+            System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + ((sender as Button)!.Uid.ToString() ?? "").Replace("\"", "\\\"") + "\"");
         }
     }
 }

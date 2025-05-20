@@ -26,6 +26,13 @@ namespace OVChecker
         private StreamWriter? outputLog = null;
         public bool IsWorkflowFinished = true;
         public bool ThreadStop = false;
+        private const int OutputBufCapacity = 1024 * 1024;
+        private const int OutputLogCapacity = 25 * 1024 * 1024;
+        private bool OutputLogOverflow = false;
+        private long OutputLogLength = 0;
+        private StringBuilder OutputBuf = new(OutputBufCapacity);
+        private long LastOutputFlush = 0;
+        private string OutputLogPath = string.Empty;
 
         public enum ProcessStatus
         {
@@ -95,7 +102,10 @@ namespace OVChecker
             if (OutputFileName != null)
             {
                 outputLog = new StreamWriter(OutputFileName);
+                OutputLogPath = OutputFileName;
             }
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             foreach (ProcessItem item in workflow)
             {
                 if (ThreadStop) { break; }
@@ -198,6 +208,31 @@ namespace OVChecker
                     IsWorkflowFinished = true;
                 })
             );
+            if (OutputBuf.Length > 0)
+            {
+                string show_data = OutputBuf.ToString();
+                ProcessLog.Dispatcher.Invoke(
+                    new Action(() =>
+                    {
+                        ProcessLog.BeginChange();
+                        ProcessLog.AppendText(show_data);
+                        if (MnuAutoScroll.IsChecked == true)
+                        {
+                            try
+                            {
+                                ProcessLog.CaretIndex = ProcessLog.Text.Length;
+                                ProcessLog.ScrollToEnd();
+                            }
+                            catch
+                            { }
+                        }
+                        ProcessLog.EndChange();
+                    }), System.Windows.Threading.DispatcherPriority.Input
+                );
+                OutputBuf.Clear();
+            }
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             if (outputLog != null)
             {
                 outputLog.Flush();
@@ -237,25 +272,75 @@ namespace OVChecker
         }
         private void OutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            if (outLine.Data == null) return;
-            ProcessLog.Dispatcher.Invoke(
-                new Action(() =>
+            if (string.IsNullOrEmpty(outLine.Data)) return;
+            long cur_time = Environment.TickCount;
+            long update_speed = OutputLogLength > 1024 * 1024 ? 10000 : 1000;
+            if (!OutputLogOverflow)
+            {
+                long diff = cur_time - LastOutputFlush;
+                if ((diff > update_speed || OutputBuf.Length + outLine.Data.Length + 1 > OutputBufCapacity) && OutputBuf.Length > 0)
                 {
-                    ProcessLog.BeginChange();
-                    ProcessLog.AppendText(outLine.Data + "\n");
-                    if (MnuAutoScroll.IsChecked == true)
-                    {
-                        try
+                    string show_data = OutputBuf.ToString();
+                    OutputLogLength += OutputBuf.Length;
+                    OutputBuf.Clear();
+                    ProcessLog.Dispatcher.Invoke(
+                        new Action(() =>
                         {
-                            ProcessLog.CaretIndex = ProcessLog.Text.Length;
-                            ProcessLog.ScrollToEnd();
-                        }
-                        catch
-                        { }
+                            ProcessLog.BeginChange();
+                            ProcessLog.AppendText(show_data);
+                            show_data = string.Empty;
+                            if (MnuAutoScroll.IsChecked == true)
+                            {
+                                try
+                                {
+                                    ProcessLog.CaretIndex = ProcessLog.Text.Length;
+                                    ProcessLog.ScrollToEnd();
+                                }
+                                catch
+                                { }
+                            }
+                            ProcessLog.EndChange();
+                        }), System.Windows.Threading.DispatcherPriority.Input
+                    );
+                    if (cur_time - LastOutputFlush > 1000)
+                    {
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
                     }
-                    ProcessLog.EndChange();
-                }), System.Windows.Threading.DispatcherPriority.Input
-            );
+                    LastOutputFlush = cur_time;
+                }
+                OutputBuf.Append(outLine.Data);
+                OutputBuf.Append("\n");
+                if (OutputLogLength + outLine.Data.Length > OutputLogCapacity)
+                {
+                    OutputLogOverflow = true;
+                    ProcessLog.Dispatcher.Invoke(
+                        new Action(() =>
+                        {
+                            ProcessLog.BeginChange();
+                            ProcessLog.AppendText("Task log is more than " + ((OutputLogCapacity + 1024 * 1024 - 1) / (1024 * 1024)) + "Mb and cannot be effectively displayed\n");
+                            if (outputLog != null)
+                            {
+                                ProcessLog.AppendText("Please, use an external application to view stored log:\n");
+                                ProcessLog.AppendText(OutputLogPath);
+                            }
+                            ProcessLog.AppendText("\n\nTask continues execution...\n");
+                            if (MnuAutoScroll.IsChecked == true)
+                            {
+                                try
+                                {
+                                    ProcessLog.CaretIndex = ProcessLog.Text.Length;
+                                    ProcessLog.ScrollToEnd();
+                                }
+                                catch
+                                { }
+                            }
+                            ProcessLog.EndChange();
+                        }), System.Windows.Threading.DispatcherPriority.Input
+                    );
+                }
+            }
+
             if (outputLog != null)
             {
                 outputLog.WriteLine(outLine.Data);
@@ -264,11 +349,17 @@ namespace OVChecker
         }
         private void OutputHandler(string outLine)
         {
-            ProcessLog.Dispatcher.Invoke(
+            long cur_time = Environment.TickCount;
+            if ((cur_time - LastOutputFlush > 1000 || OutputBuf.Length + outLine.Length + 1 > OutputBufCapacity) && OutputBuf.Length > 0)
+            {
+                string show_data = OutputBuf.ToString();
+                OutputLogLength += OutputBuf.Length;
+                OutputBuf.Clear();
+                ProcessLog.Dispatcher.Invoke(
                 new Action(() =>
                 {
                     ProcessLog.BeginChange();
-                    ProcessLog.AppendText(outLine + "\n");
+                    ProcessLog.AppendText(show_data);
                     if (MnuAutoScroll.IsChecked == true)
                     {
                         try
@@ -281,7 +372,12 @@ namespace OVChecker
                     }
                     ProcessLog.EndChange();
                 }), System.Windows.Threading.DispatcherPriority.Input
-            );
+                );
+                LastOutputFlush = cur_time;
+            }
+            OutputBuf.Append(outLine);
+            OutputBuf.Append("\n");
+            GC.Collect();
             if (outputLog != null)
             {
                 outputLog.WriteLine(outLine);
@@ -416,6 +512,13 @@ namespace OVChecker
                 }
             }
             catch { }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            ProcessLog.Text = "";
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }

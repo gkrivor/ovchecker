@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OVChecker"
         mc:Ignorable="d"
-        Title="Process Output" Height="450" Width="800" Closing="Window_Closing">
+        Title="Process Output" Height="450" Width="800" Closing="Window_Closing" Closed="Window_Closed">
     <Grid>
         <Menu>
             <MenuItem Header="_Process">
@@ -22,7 +22,7 @@
                 <MenuItem x:Name="MnuFolders" Header="Working _folders..."/>
             </MenuItem>
         </Menu>
-        <TextBox x:Name="ProcessLog" TextWrapping="NoWrap" Text="" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,22,0,32" VerticalAlignment="Stretch" IsReadOnly="True" IsReadOnlyCaretVisible="True" IsInactiveSelectionHighlightEnabled="True" FontFamily="Courier New" AcceptsTab="True" KeyDown="ProcessLog_KeyDown"/>
+        <TextBox x:Name="ProcessLog" TextWrapping="NoWrap" Text="" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,22,0,32" VerticalAlignment="Stretch" IsReadOnly="True" IsReadOnlyCaretVisible="True" IsInactiveSelectionHighlightEnabled="True" FontFamily="Courier New" AcceptsTab="True" KeyDown="ProcessLog_KeyDown" UndoLimit="0" IsUndoEnabled="False"/>
         <ToolBar Height="32" VerticalAlignment="Bottom">
             <Label Content="Search: "/>
             <TextBox x:Name="TextSearch" Margin="0,2,0,3" Width="256" KeyUp="TextSearch_KeyUp"/>

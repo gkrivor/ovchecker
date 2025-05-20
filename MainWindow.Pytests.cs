@@ -22,9 +22,9 @@ namespace OVChecker
             set
             {
                 string _value = value.Replace("/", "\\");
-                if (System.IO.Directory.Exists(_value) && !_value.EndsWith("/"))
+                if (System.IO.Directory.Exists(_value) && !_value.EndsWith("\\"))
                 {
-                    _value += "/";
+                    _value += "\\";
                 }
                 if (_PytestsPath == _value) return;
                 _PytestsPath = _value;
@@ -152,7 +152,13 @@ namespace OVChecker
             {
                 System.Diagnostics.Process process = new();
                 process.StartInfo.FileName = PythonPath;
-                process.StartInfo.Arguments = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + "\" --collect-only -ra";
+                if (System.IO.Directory.Exists(PytestsPath))
+                {
+                    process.StartInfo.Arguments = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + ".\" --collect-only -ra";
+                } else
+                {
+                    process.StartInfo.Arguments = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + "\" --collect-only -ra";
+                }
                 if (TextPytestFilter.Text.Length > 0)
                 {
                     process.StartInfo.Arguments += " -k \"" + TextPytestFilter.Text.Replace("\"", "\\\"") + "\"";
@@ -291,7 +297,15 @@ namespace OVChecker
             */
             //System.IO.File.WriteAllText(script_path, script);
 
-            string args = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + "\" --disable-warnings --no-header -v -k \"";
+            string args = string.Empty;
+            if (System.IO.Directory.Exists(PytestsPath))
+            {
+                args = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + ".\" --disable-warnings --no-header -v -k \"";
+            }
+            else
+            {
+                args = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + "\" --disable-warnings --no-header -v -k \"";
+            }
             if (TextPytestFilter.Text.Length > 0)
             {
                 args += TextPytestFilter.Text.Replace("\"", "\\\"") + " and ";

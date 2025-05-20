@@ -414,7 +414,8 @@ namespace OVChecker
 
         private void ButtonBrowsePytestsFolder_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog openDialog = new() {
+            System.Windows.Forms.FolderBrowserDialog openDialog = new()
+            {
                 Description = "Select a folder for Pytests lookup",
                 UseDescriptionForTitle = true,
                 ShowNewFolderButton = true
@@ -423,7 +424,9 @@ namespace OVChecker
             var result = openDialog.ShowDialog();
             if (result != System.Windows.Forms.DialogResult.OK) return;
 
-            SelectOrAddComboBoxItem(CBoxPytestsPath, openDialog.SelectedPath.Replace("/", "\\"));
+            string folder = openDialog.SelectedPath.Replace("/", "\\");
+            if (!folder.EndsWith("\\")) folder += "\\";
+            SelectOrAddComboBoxItem(CBoxPytestsPath, folder);
         }
 
         private void CBoxPytestsPath_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -282,12 +282,11 @@ namespace OVChecker
         {
             if (string.IsNullOrEmpty(outLine.Data)) return;
             long cur_time = Environment.TickCount;
-            long update_speed = OutputLogLength > 1024 * 1024 ? 2000 : 100;
+            long update_speed = OutputLogLength > OutputBufCapacity ? 1000 : 100;
             long diff = cur_time - LastOutputFlush;
-            if ((diff > update_speed || OutputBuf.Length + outLine.Data.Length + 1 > OutputBufCapacity) && OutputBuf.Length > 0)
+            if (diff > update_speed && OutputBuf.Length > 0)
             {
                 string show_data = OutputBuf.ToString();
-                OutputLogLength += OutputBuf.Length;
                 OutputBuf.Clear();
                 ProcessLog.Dispatcher.Invoke(
                     new Action(() =>
@@ -330,7 +329,18 @@ namespace OVChecker
                 }
                 LastOutputFlush = cur_time;
             }
-            OutputBuf.Append(outLine.Data);
+            OutputLogLength += outLine.Data.Length;
+            if (OutputBuf.Length + outLine.Data.Length + 1 > OutputBufCapacity)
+            {
+                if (outLine.Data.Length < OutputBufCapacity)
+                    OutputBuf.Remove(0, outLine.Data.Length + 1);
+                else
+                    OutputBuf.Clear();
+            }
+            if(outLine.Data.Length < OutputBufCapacity)
+                OutputBuf.Append(outLine.Data);
+            else
+                OutputBuf.Append(outLine.Data.Substring(outLine.Data.Length - OutputBufCapacity - 1));
             OutputBuf.Append("\n");
 
             if (outputLog != null)

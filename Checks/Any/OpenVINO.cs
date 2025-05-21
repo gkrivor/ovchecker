@@ -226,6 +226,7 @@ namespace OVChecker
                 "# OnBeforeCheck\n" +
                 "m = ie.read_model(\"%MODEL_PATH%\")\n" +
                 "c = ie.compile_model(m, \"%DEVICE%\")\n" +
+                "m = None\n" +
                 "# OnAfterCheck\n" +
                 "print(\">>> Done\")"
                 ));

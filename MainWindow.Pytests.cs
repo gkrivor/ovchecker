@@ -155,7 +155,8 @@ namespace OVChecker
                 if (System.IO.Directory.Exists(PytestsPath))
                 {
                     process.StartInfo.Arguments = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + ".\" --collect-only -ra";
-                } else
+                }
+                else
                 {
                     process.StartInfo.Arguments = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + "\" --collect-only -ra";
                 }
@@ -252,7 +253,7 @@ namespace OVChecker
             }
             */
         }
-        private void PreparePytest(PytestItem item, List<AppOutput.ProcessItem> tasks, string python_path, string? custom_env)
+        private void PreparePytest(PytestItem? item, List<AppOutput.ProcessItem> tasks, string python_path, string? custom_env)
         {
             /*
             if (item.Requirements != "")
@@ -297,24 +298,63 @@ namespace OVChecker
             */
             //System.IO.File.WriteAllText(script_path, script);
 
-            string args = string.Empty;
-            if (System.IO.Directory.Exists(PytestsPath))
+            StringBuilder script = new();
+            script.Append("import sys\n" +
+                "import os\n" +
+                "import pytest\n\n");
+
+            if (TextPytestFilter.Text.Length > 0)
             {
-                args = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + ".\" --disable-warnings --no-header -v -k \"";
+                script.AppendLine("users_filter = \"" + TextPytestFilter.Text.Replace("\"", "\\\"") + "\"");
             }
             else
             {
-                args = "-m pytest \"" + PytestsPath.Replace("\"", "\\\"") + "\" --disable-warnings --no-header -v -k \"";
+                script.AppendLine("users_filter = None");
             }
-            if (TextPytestFilter.Text.Length > 0)
+
+            script.AppendLine("test_cases = [");
+            if (item == null)
             {
-                args += TextPytestFilter.Text.Replace("\"", "\\\"") + " and ";
+                bool has_any = false;
+                foreach (var pyitem in Pytests)
+                {
+                    if (pyitem.Selected == false) continue;
+                    script.AppendLine("\"" + pyitem.Name.Replace("\"", "\\\"") + "\",");
+                    has_any = true;
+                }
+                if (!has_any) return;
             }
+            else
+            {
+                script.AppendLine("\"" + item.Name.Replace("\"", "\\\"") + "\",");
+            }
+            script.AppendLine("]");
+            script.AppendLine("if users_filter is None:\n" +
+                "  test_list = \" or \".join(test_cases)\n" +
+                "else:\n" +
+                "  test_list = users_filter + \" and (\" + \" or \".join(test_cases) + \")\"\n");
+            script.AppendLine("# OnBeforeCheck");
+            script.Append("res = pytest.main([");
+            script.Append("\"" + PytestsPath.Replace("\"", "\\\"").Replace("\\", "\\\\"));
+            if (System.IO.Directory.Exists(PytestsPath))
+            {
+                script.Append(".");
+            }
+            script.Append("\",");
+            script.Append("\"--disable-warnings\",");
+            script.Append("\"--no-header\",");
+            script.Append("\"-v\",");
+            script.Append("\"-k\",");
+            script.Append("test_list");
+            script.AppendLine("])");
+            script.AppendLine("# OnAfterCheck");
+            script.AppendLine("print(\">>> Done\")");
+            script.AppendLine("sys.exit(res)");
 
-            args += item.Name + "\"";
+            string pytest_script = WorkDir + "pytest_run.py";
+            System.IO.File.WriteAllText(pytest_script, script.ToString());
 
-
-            tasks.Add(new() { Name = python_path, Args = args, WorkingDir = WorkDir, CustomEnvVars = custom_env, DontStopOnError = (CBFastFailPytests.IsChecked == false), NoWindow = true, ItemSource = item, StatusHandler = PytestItemStatusHandler });
+            tasks.Add(new() { Name = python_path, Args = "\"" + pytest_script.Replace("\"", "\\\"") + "\"", WorkingDir = WorkDir, CustomEnvVars = custom_env, DontStopOnError = (CBFastFailPytests.IsChecked == false), NoWindow = true, ItemSource = item, StatusHandler = PytestItemStatusHandler });
         }
     }
 }

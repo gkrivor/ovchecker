@@ -486,7 +486,7 @@ namespace OVChecker
             if (tasks.Count <= 0) return;
 
             AppOutput app = new();
-            app.RunProcess("Single Test: " + item.Name, tasks, WorkDir + "latest.log");
+            app.RunProcess("Single Test: " + item!.Name, tasks, WorkDir + "latest.log");
         }
 
         private void ButtonRunSelectedPytests_Click(object sender, RoutedEventArgs e)
@@ -497,15 +497,7 @@ namespace OVChecker
             string? custom_env = null;
 
             PrepareEnvironment(tasks, python_path, ref custom_env);
-
-            for (int i = 0; i < Pytests.Count; i++)
-            {
-                var item = Pytests[i]!;
-
-                if (item.Selected == false) continue;
-
-                PreparePytest(item, tasks, python_path, custom_env);
-            }
+            PreparePytest(null, tasks, python_path, custom_env);
 
             if (tasks.Count <= 0) return;
 

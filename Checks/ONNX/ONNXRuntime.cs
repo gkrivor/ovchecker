@@ -41,7 +41,11 @@ namespace OVChecker
                 "    if not item in ov_inputs[i].names: raise Exception(f\"OpenVINO has a wrong inputs order near {item}\")\n" +
                 "    if ov_inputs[i].get_partial_shape().is_static and ort_inputs[i].shape != ov_inputs[i].shape: raise Exception(f\"Misalignment in shapes for {item} ONNXRuntime/OpenVINO: {ort_inputs[i].shape}/{ov_inputs[i].shape}\")\n" +
                 "    shape = [1 if dim == -1 else dim.min_length for dim in ov_inputs[i].get_partial_shape()]\n" +
-                "    input_data[item] = np.random.randn(*shape).astype(np.dtype(ov_inputs[i].get_element_type().to_dtype()))\n" +
+                "    input_data[item] = np.random.randn(*shape)\n" +
+                "    input_type = ov_inputs[i].get_element_type()\n" +
+                "    if not isinstance(input_data[item], np.ndarray): input_data[item] = np.array(input_data[item])\n" +
+                "    if input_type.is_integral(): input_data[item] *= 1 << (input_type.get_bitwidth() - (1 if input_type.is_signed() else 0))\n" +
+                "    input_data[item] = input_data[item].astype(np.dtype(input_type.to_dtype()))\n" +
                 "for i, item in enumerate(ort_onames):\n" +
                 "    if not item in ov_onames: raise Exception(f\"OpenVINO doesn't have output named {item}\")\n" +
                 "    if not item in ov_outputs[i].names: raise Exception(f\"OpenVINO has a wrong outputs order near {item}\")\n" +
@@ -51,7 +55,7 @@ namespace OVChecker
                 "ov_results = i.infer(input_data)\n" +
                 "is_failed = False\n" +
                 "for i, item in enumerate(ort_results):\n" +
-                "    diff = np.abs(ort_results[i] - ov_results[i]).max()\n" +
+                "    diff = np.abs(np.nan_to_num(ort_results[i]) - np.nan_to_num(ov_results[i])).max()\n" +
                 "    print(f\"\\\"{ort_onames[i]}\\\" abs diff is {diff}\")\n" +
                 "    is_failed |= diff > 0.00001\n" +
                 "if is_failed == True: raise Exception(\"Diff for one of outputs more than 0.00001\")\n" +

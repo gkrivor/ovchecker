@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace OVChecker
 {
@@ -329,23 +330,24 @@ namespace OVChecker
                 }
                 LastOutputFlush = cur_time;
             }
-            OutputLogLength += outLine.Data.Length;
-            if (OutputBuf.Length + outLine.Data.Length + 1 > OutputBufCapacity)
+            string log_text = Regex.Replace(outLine.Data, @"\e\[[0-9;]*m", "");
+            OutputLogLength += log_text.Length;
+            if (OutputBuf.Length + log_text.Length + 1 > OutputBufCapacity)
             {
-                if (outLine.Data.Length < OutputBufCapacity)
-                    OutputBuf.Remove(0, outLine.Data.Length + 1);
+                if (log_text.Length < OutputBufCapacity)
+                    OutputBuf.Remove(0, log_text.Length + 1);
                 else
                     OutputBuf.Clear();
             }
-            if(outLine.Data.Length < OutputBufCapacity)
-                OutputBuf.Append(outLine.Data);
+            if (log_text.Length < OutputBufCapacity)
+                OutputBuf.Append(log_text);
             else
-                OutputBuf.Append(outLine.Data.Substring(outLine.Data.Length - OutputBufCapacity - 1));
+                OutputBuf.Append(log_text.Substring(log_text.Length - OutputBufCapacity - 1));
             OutputBuf.Append("\n");
 
             if (outputLog != null)
             {
-                outputLog.WriteLine(outLine.Data);
+                outputLog.WriteLine(log_text);
                 outputLog.Flush();
             }
         }

@@ -504,5 +504,33 @@ namespace OVChecker
             AppOutput app = new();
             app.RunProcess("Pytest: " + PytestsPath, tasks, WorkDir + "latest.log");
         }
+
+        private void ButtonPipControl_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button)) return;
+            string action = (sender as Button)!.Uid;
+            string python_path = PythonPath;
+            string? custom_env = null;
+            List<AppOutput.ProcessItem> tasks = new();
+
+            if (action == "pip_list")
+            {
+                AppOutput app = new();
+                tasks.Add(new() { Name = python_path, Args = "-m pip list", WorkingDir = WorkDir, CustomEnvVars = custom_env, NoWindow = true });
+                app.RunProcess("pip list", tasks, WorkDir + "pip.log");
+            }
+            else if (action == "pip_install")
+            {
+                if(string.IsNullOrEmpty(TextPipInstall.Text))
+                {
+                    MessageBox.Show("Please, enter a list of PyPi packages into the text box", "Empty packages", MessageBoxButton.OK, MessageBoxImage.Information);
+                    TextPipInstall.Focus();
+                    return;
+                }
+                AppOutput app = new();
+                tasks.Add(new() { Name = python_path, Args = "-m pip list", WorkingDir = WorkDir, CustomEnvVars = custom_env, NoWindow = true });
+                app.RunProcess("pip install " + TextPipInstall.Text, tasks, WorkDir + "pip.log");
+            }
+        }
     }
 }

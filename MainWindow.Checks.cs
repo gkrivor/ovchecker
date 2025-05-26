@@ -140,6 +140,30 @@ namespace OVChecker
             string script = item.Script.Replace("\r", "");
             script = script.Replace("%MODEL_PATH%", ModelPath.Replace("\\", "/"));
 
+            {
+                string openvino_path = CBoxOpenVINOPath.Text.Replace("\"", "\\\"");
+                StringBuilder exec_info = new();
+                exec_info.AppendLine("# Python: " + python_path);
+                if (CBoxOpenVINOPath.SelectedItem != null && !(CBoxOpenVINOPath.SelectedItem is ComboBoxOpenVINOItem) && !(CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!.Content.ToString()!.ToLower().EndsWith(".whl"))
+                {
+                    exec_info.AppendLine("os.environ[\"OPENVINO_LIB_PATHS\"] = \"" + openvino_path.Replace("\\", "\\\\") + "\"");
+                    exec_info.AppendLine("sys.path.extend(\"" + (openvino_path + "python\\;" + openvino_path + "..\\..\\..\\tools\\ovc\\;").Replace("\\", "\\\\") + "\".split(\";\"))");
+                }
+                else
+                {
+                    exec_info.AppendLine("# OpenVINO: " + openvino_path);
+                }
+                const string keyword = "import os\n";
+                var pos = script.IndexOf(keyword);
+                if (pos != -1)
+                {
+                    if (pos + keyword.Length < script.Length)
+                        script = script.Insert(pos + keyword.Length, exec_info.ToString());
+                    else
+                        script += exec_info.ToString();
+                }
+            }
+
             // Apply customizations
             var description = OVChecksDescriptions.GetDescriptionByGUID(item.GUID);
             if (description != null)

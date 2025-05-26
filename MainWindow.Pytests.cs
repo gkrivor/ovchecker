@@ -303,6 +303,19 @@ namespace OVChecker
                 "import os\n" +
                 "import pytest\n\n");
 
+            script.AppendLine("# Python: " + python_path);
+
+            string openvino_path = CBoxOpenVINOPath.Text.Replace("\"", "\\\"");
+            if (CBoxOpenVINOPath.SelectedItem != null && !(CBoxOpenVINOPath.SelectedItem is ComboBoxOpenVINOItem) && !(CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!.Content.ToString()!.ToLower().EndsWith(".whl"))
+            {
+                script.AppendLine("os.environ[\"OPENVINO_LIB_PATHS\"] = \"" + openvino_path.Replace("\\", "\\\\") + "\"");
+                script.AppendLine("sys.path.extend(\"" + (openvino_path + "python\\;" + openvino_path + "..\\..\\..\\tools\\ovc\\;").Replace("\\", "\\\\") + "\".split(\";\"))");
+            }
+            else
+            {
+                script.AppendLine("# OpenVINO: " + openvino_path);
+            }
+
             if (TextPytestFilter.Text.Length > 0)
             {
                 script.AppendLine("users_filter = \"" + TextPytestFilter.Text.Replace("\"", "\\\"") + "\"");

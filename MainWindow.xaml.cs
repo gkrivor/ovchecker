@@ -313,7 +313,7 @@ namespace OVChecker
         {
             try
             {
-                System.Diagnostics.Process.Start((sender as Button)!.Uid);
+                System.Diagnostics.Process.Start(new ProcessStartInfo((sender as Button)!.Uid) { UseShellExecute = true});
             }
             catch { }
         }

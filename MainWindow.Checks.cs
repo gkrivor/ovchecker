@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace OVChecker
 {
@@ -71,15 +72,38 @@ namespace OVChecker
         }
         private void ShowAvailableChecksCustomizations()
         {
-            foreach (var list_item in ListChecksCustomizations.Items)
+            var save_state = (ListBoxItem item) =>
             {
-                var panel = ((list_item as ListBoxItem)!.Content as WrapPanel);
+                var panel = (item.Content as WrapPanel);
                 if (panel!.Children[1] is System.Windows.Controls.CheckBox)
                     CustomizationsState[panel!.Uid] = (panel!.Children[1] as System.Windows.Controls.CheckBox)!.IsChecked;
                 else if (panel!.Children[1] is System.Windows.Controls.TextBox)
                     CustomizationsState[panel!.Uid] = (panel!.Children[1] as System.Windows.Controls.TextBox)!.Text;
+            };
+            foreach (var list_item in ListChecksCustomizations.Items)
+            {
+                if (list_item is ListBoxItem)
+                {
+                    save_state((list_item as ListBoxItem)!);
+                    continue;
+                }
+                if (list_item is Expander)
+                {
+                    var expander = (list_item as Expander)!;
+                    CustomizationsState[expander.Header.ToString()!] = expander.IsExpanded ? "yes":"no";
+                    foreach (var list_item2 in ((list_item as Expander)!.Content as Panel)!.Children)
+                    {
+                        if (list_item2 is ListBoxItem)
+                        {
+                            save_state((list_item2 as ListBoxItem)!);
+                            continue;
+                        }
+                    }
+                    continue;
+                }
             }
             ListChecksCustomizations.Items.Clear();
+            Dictionary<string, Expander> groups = new();
             for (int i = 0; i < OVChecks.Count; i++)
             {
                 var item = OVChecks[i]!;
@@ -94,13 +118,41 @@ namespace OVChecker
                     bool exists = false;
                     foreach (var itm in ListChecksCustomizations.Items)
                     {
-                        if (((itm as System.Windows.Controls.ListBoxItem)!.Content as WrapPanel)!.Uid == customization.GUID)
+                        if ((itm is ListBoxItem) && ((itm as ListBoxItem)!.Content as WrapPanel)!.Uid == customization.GUID)
                         {
                             exists = true;
                             break;
                         }
+                        if (itm is Expander)
+                        {
+                            foreach(var itm2 in ((itm as Expander)!.Content as Panel)!.Children)
+                            {
+                                if (((itm2 as ListBoxItem)!.Content as WrapPanel)!.Uid == customization.GUID)
+                                {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (exists) break;
+                        }
                     }
                     if (exists) continue;
+                    Expander group_panel;
+                    if (groups.ContainsKey(customization.Group))
+                    {
+                        group_panel = groups[customization.Group];
+                    }
+                    else
+                    {
+                        group_panel = new Expander() { Header = customization.Group };
+                        group_panel.Content = new StackPanel();
+                        groups[customization.Group] = group_panel;
+                        ListChecksCustomizations.Items.Add(group_panel);
+                        if(CustomizationsState.ContainsKey(group_panel.Header.ToString()!))
+                        {
+                            group_panel.IsExpanded = CustomizationsState[group_panel.Header.ToString()!]!.ToString() == "yes";
+                        }
+                    }
                     var list_item = new System.Windows.Controls.ListViewItem();
                     var panel = new System.Windows.Controls.WrapPanel();
                     panel.Uid = customization.GUID;
@@ -120,7 +172,7 @@ namespace OVChecker
                         panel.Children.Add(new System.Windows.Controls.TextBox() { Uid = customization.GUID, Margin = new(10, 0, 0, 0), MinWidth = 64, ToolTip = customization.Name, Text = value });
                     }
                     list_item.Content = panel;
-                    ListChecksCustomizations.Items.Add(list_item);
+                    (group_panel.Content as StackPanel)!.Children.Add(list_item);
                 }
             }
         }
@@ -168,9 +220,8 @@ namespace OVChecker
             var description = OVChecksDescriptions.GetDescriptionByGUID(item.GUID);
             if (description != null)
             {
-                foreach (var list_item in ListChecksCustomizations.Items)
+                var apply_customization = (Panel panel) =>
                 {
-                    var panel = ((list_item as ListBoxItem)!.Content as WrapPanel);
                     foreach (var custom in description.Customizations)
                     {
                         if (custom.GUID != panel!.Uid) continue;
@@ -185,6 +236,22 @@ namespace OVChecker
                         {
                             var tb = panel.Children[1] as System.Windows.Controls.TextBox;
                             custom.Handler(custom, tb!.Text, ref script, ref custom_env);
+                        }
+                    }
+                };
+
+                foreach (var list_item in ListChecksCustomizations.Items)
+                {
+                    if (list_item is ListBoxItem)
+                    {
+                        apply_customization(((list_item as ListBoxItem)!.Content as Panel)!);
+                        continue;
+                    }
+                    if (list_item is Expander)
+                    {
+                        foreach (var list_item2 in ((list_item as Expander)!.Content as Panel)!.Children)
+                        {
+                            apply_customization(((list_item2 as ListBoxItem)!.Content as Panel)!);
                         }
                     }
                 }

@@ -173,7 +173,7 @@ namespace OVChecker
                     }
                     if (!string.IsNullOrEmpty(customization.HelpURL))
                     {
-                        var btn_help = new Button() { Content = "?", Uid = customization.HelpURL, Margin = new(5, 0, 0, 0), Padding = new(3, 0, 3, 0), ToolTip = "Show help" };
+                        var btn_help = new Button() { Content = "?", Uid = customization.HelpURL, Margin = new(5, 0, 0, 0), Padding = new(3, 0, 3, 0), ToolTip = "Show help", Cursor = System.Windows.Input.Cursors.Hand };
                         btn_help.Click += (s, e) =>
                         {
                             System.Diagnostics.Process.Start("explorer.exe", (s as Button)!.Uid);

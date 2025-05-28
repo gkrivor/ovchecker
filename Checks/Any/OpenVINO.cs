@@ -74,6 +74,7 @@ namespace OVChecker
             Name = "Enable OpenVINO Profile Pass",
             Group = "OpenVINO Transformations Debug",
             Value = false,
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/transformation_statistics_collection.md",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
@@ -85,10 +86,23 @@ namespace OVChecker
             Name = "Enable OpenVINO SVG Dump Pass",
             Group = "OpenVINO Transformations Debug",
             Value = false,
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/transformation_statistics_collection.md",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
                 AddEnvironmentVariable(ref script, "OV_ENABLE_VISUALIZE_TRACING", "\"true\"");
+            }
+        };
+        static public OVCheckCustomization EnableSerializeTracingCustomization = new()
+        {
+            Name = "Enable OpenVINO XML Dump Pass",
+            Group = "OpenVINO Transformations Debug",
+            Value = false,
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/transformation_statistics_collection.md",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (bool.Parse(value!.ToString()!) != true) return;
+                AddEnvironmentVariable(ref script, "OV_ENABLE_SERIALIZE_TRACING", "\"true\"");
             }
         };
         static public OVCheckCustomization PrintResourceConsumptionCustomization = new()
@@ -139,6 +153,7 @@ namespace OVChecker
             Name = "Enable OpenVINO Matcher Logging",
             Group = "OpenVINO Transformations Debug",
             Value = false,
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/matcher_logging.md",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
@@ -150,6 +165,7 @@ namespace OVChecker
             Name = "Specify Matcher Logging Transformation",
             Group = "OpenVINO Transformations Debug",
             Value = "",
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/matcher_logging.md",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (!(value is string) || value.ToString() == "") return;
@@ -161,6 +177,7 @@ namespace OVChecker
             Name = "Enable Transformations Verbose Logging",
             Group = "OpenVINO Transformations Debug",
             Value = false,
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/matcher_logging.md",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
@@ -185,7 +202,6 @@ namespace OVChecker
             item.Customizations.Add(PauseBeforeCheckCustomization);
             if (!item.Requirements.Contains("psutil")) item.Requirements += "psutil";
             item.Customizations.Add(PrintResourceConsumptionCustomization);
-            item.Customizations.Add(EnableGPUDumpMemoryPoolCustomization);
             item.Customizations.Add(SerializeCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);
             item.Customizations.Add(EnableVisualizeTracingCustomization);
@@ -235,6 +251,17 @@ namespace OVChecker
                 "import openvino as ov\n" +
                 "# OnBeforeCheck\n" +
                 "m = ov.convert_model(\"%MODEL_PATH%\")\n" +
+                "# OnAfterCheck\n" +
+                "print(\">>> Done\")"
+                ));
+            AddCustomizations2(OVChecksDescriptions.RegisterDescription(OVFrontends.Any, "OpenVINO Convert model + Compile", "import sys\n" +
+                "import os\n" +
+                "import openvino as ov\n" +
+                "ie = ov.Core()\n" +
+                "# OnBeforeCheck\n" +
+                "m = ov.convert_model(\"%MODEL_PATH%\")\n" +
+                "c = ie.compile_model(m, \"%DEVICE%\")\n" +
+                "m = None\n" +
                 "# OnAfterCheck\n" +
                 "print(\">>> Done\")"
                 ));

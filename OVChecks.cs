@@ -31,6 +31,7 @@ namespace OVChecker
         public object? Value { get; set; }
         public CustomizationApplied? Handler { get; set; }
         public string GUID { get; set; }
+        public string HelpURL { get; set; }
         public OVCheckCustomization()
         {
             Type = CustomizationType.Unknown;
@@ -38,6 +39,7 @@ namespace OVChecker
             Group = "";
             Value = null;
             GUID = Guid.NewGuid().ToString();
+            HelpURL = "";
         }
     }
     public class OVCheckDescription

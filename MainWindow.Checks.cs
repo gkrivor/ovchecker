@@ -90,7 +90,7 @@ namespace OVChecker
                 if (list_item is Expander)
                 {
                     var expander = (list_item as Expander)!;
-                    CustomizationsState[expander.Header.ToString()!] = expander.IsExpanded ? "yes":"no";
+                    CustomizationsState[expander.Header.ToString()!] = expander.IsExpanded ? "yes" : "no";
                     foreach (var list_item2 in ((list_item as Expander)!.Content as Panel)!.Children)
                     {
                         if (list_item2 is ListBoxItem)
@@ -125,7 +125,7 @@ namespace OVChecker
                         }
                         if (itm is Expander)
                         {
-                            foreach(var itm2 in ((itm as Expander)!.Content as Panel)!.Children)
+                            foreach (var itm2 in ((itm as Expander)!.Content as Panel)!.Children)
                             {
                                 if (((itm2 as ListBoxItem)!.Content as WrapPanel)!.Uid == customization.GUID)
                                 {
@@ -148,7 +148,7 @@ namespace OVChecker
                         group_panel.Content = new StackPanel();
                         groups[customization.Group] = group_panel;
                         ListChecksCustomizations.Items.Add(group_panel);
-                        if(CustomizationsState.ContainsKey(group_panel.Header.ToString()!))
+                        if (CustomizationsState.ContainsKey(group_panel.Header.ToString()!))
                         {
                             group_panel.IsExpanded = CustomizationsState[group_panel.Header.ToString()!]!.ToString() == "yes";
                         }
@@ -162,7 +162,7 @@ namespace OVChecker
                         bool value = bool.Parse(customization.Value.ToString()!);
                         if (CustomizationsState.ContainsKey(customization.GUID))
                             value = bool.Parse(CustomizationsState[customization.GUID]!.ToString()!);
-                        panel.Children.Add(new System.Windows.Controls.CheckBox() { Uid = customization.GUID, Margin = new(10, 0, 0, 0), ToolTip = customization.Name, IsChecked = value });
+                        panel.Children.Add(new System.Windows.Controls.CheckBox() { Uid = customization.GUID, Margin = new(10, 1, 0, 0), ToolTip = customization.Name, IsChecked = value });
                     }
                     else if (customization.Value is string)
                     {
@@ -170,6 +170,15 @@ namespace OVChecker
                         if (CustomizationsState.ContainsKey(customization.GUID))
                             value = CustomizationsState[customization.GUID]!.ToString()!;
                         panel.Children.Add(new System.Windows.Controls.TextBox() { Uid = customization.GUID, Margin = new(10, 0, 0, 0), MinWidth = 64, ToolTip = customization.Name, Text = value });
+                    }
+                    if (!string.IsNullOrEmpty(customization.HelpURL))
+                    {
+                        var btn_help = new Button() { Content = "?", Uid = customization.HelpURL, Margin = new(5, 0, 0, 0), Padding = new(3, 0, 3, 0), ToolTip = "Show help" };
+                        btn_help.Click += (s, e) =>
+                        {
+                            System.Diagnostics.Process.Start("explorer.exe", (s as Button)!.Uid);
+                        };
+                        panel.Children.Add(btn_help);
                     }
                     list_item.Content = panel;
                     (group_panel.Content as StackPanel)!.Children.Add(list_item);

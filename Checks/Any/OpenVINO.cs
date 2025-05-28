@@ -15,7 +15,7 @@ namespace OVChecker
         static public OVCheckCustomization PrintVersionCustomization = new()
         {
             Name = "Print OpenVINO version",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Common Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
                 {
@@ -29,7 +29,7 @@ namespace OVChecker
         static public OVCheckCustomization SerializeCustomization = new()
         {
             Name = "Serialize to IR",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Common Debug",
             Value = "",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -47,7 +47,7 @@ namespace OVChecker
         static public OVCheckCustomization CompilationDeviceCustomization = new()
         {
             Name = "Compilation device",
-            Group = "OpenVINO Compile",
+            Group = "OpenVINO Compile Settings",
             Value = "CPU",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -58,7 +58,7 @@ namespace OVChecker
         static public OVCheckCustomization PauseBeforeCheckCustomization = new()
         {
             Name = "Pause before OpenVINO check",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Common Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -72,7 +72,7 @@ namespace OVChecker
         static public OVCheckCustomization EnableProfilePassCustomization = new()
         {
             Name = "Enable OpenVINO Profile Pass",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Transformations Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -83,7 +83,7 @@ namespace OVChecker
         static public OVCheckCustomization EnableVisualizeTracingCustomization = new()
         {
             Name = "Enable OpenVINO SVG Dump Pass",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Transformations Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -94,7 +94,7 @@ namespace OVChecker
         static public OVCheckCustomization PrintResourceConsumptionCustomization = new()
         {
             Name = "Print OpenVINO mem consumption",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Common Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -137,7 +137,7 @@ namespace OVChecker
         static public OVCheckCustomization EnableMatcherLoggingCustomization = new()
         {
             Name = "Enable OpenVINO Matcher Logging",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Transformations Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -148,7 +148,7 @@ namespace OVChecker
         static public OVCheckCustomization SpecifyMatcherLoggingCustomization = new()
         {
             Name = "Specify Matcher Logging Transformation",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Transformations Debug",
             Value = "",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -159,7 +159,7 @@ namespace OVChecker
         static public OVCheckCustomization EnableTransformationsVerboseLoggingCustomization = new()
         {
             Name = "Enable Transformations Verbose Logging",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Transformations Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
@@ -170,7 +170,7 @@ namespace OVChecker
         static public OVCheckCustomization EnableGPUDumpMemoryPoolCustomization = new()
         {
             Name = "Enable GPU Dump Memory Pool",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO GPU Debug",
             Value = false,
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {

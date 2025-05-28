@@ -5,7 +5,7 @@
         static public OVCheckCustomization SerializeCustomization = new()
         {
             Name = "Serialize OVC to IR",
-            Group = "OpenVINO Debug",
+            Group = "OpenVINO Common Debug",
             Value = "",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {

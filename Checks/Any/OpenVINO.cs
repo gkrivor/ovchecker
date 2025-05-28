@@ -184,6 +184,7 @@ namespace OVChecker
                 AddEnvironmentVariable(ref script, "OV_VERBOSE_LOGGING", "\"true\"");
             }
         };
+        /* ------------------------------ GPU Plugin Specific Checks ------------------------------ */
         static public OVCheckCustomization EnableGPUDumpMemoryPoolCustomization = new()
         {
             Name = "Enable GPU Dump Memory Pool",
@@ -194,6 +195,79 @@ namespace OVChecker
                 if (bool.Parse(value!.ToString()!) != true) return;
                 AddEnvironmentVariable(ref script, "OV_VERBOSE", "\"4\"");
                 AddEnvironmentVariable(ref script, "OV_GPU_DUMP_MEMORY_POOL", "\"1\"");
+            }
+        };
+        /* ------------------------------ CPU Plugin Specific Checks ------------------------------ */
+        static public OVCheckCustomization EnableCPUVerboseCustomization = new()
+        {
+            Name = "Enable CPU Verbose logging",
+            Group = "OpenVINO CPU Debug",
+            Value = false,
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/plugins/intel_cpu/docs/debug_capabilities/verbose.md",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (bool.Parse(value!.ToString()!) != true) return;
+                AddEnvironmentVariable(ref script, "OV_CPU_VERBOSE", "\"3\"");
+            }
+        };
+        static public OVCheckCustomization EnableCPUExecGraphCustomization = new()
+        {
+            Name = "Dump CPU Execution Graph",
+            Group = "OpenVINO CPU Debug",
+            Value = "",
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/plugins/intel_cpu/docs/debug_capabilities/graph_serialization.md#execution-graph",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (!(value is string) || value.ToString() == "") return;
+                AddEnvironmentVariable(ref script, "OV_CPU_EXEC_GRAPH_PATH", "\"" + value!.ToString() + "\"");
+            }
+        };
+        static public OVCheckCustomization EnableCPUDumpIRCustomization = new()
+        {
+            Name = "Dump CPU intermediate IRs",
+            Group = "OpenVINO CPU Debug",
+            Value = "",
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/plugins/intel_cpu/docs/debug_capabilities/graph_serialization.md#execution-graph",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (!(value is string) || value.ToString() == "") return;
+                AddEnvironmentVariable(ref script, "OV_CPU_DUMP_IR", "\"" + value!.ToString() + "\"");
+            }
+        };
+        static public OVCheckCustomization EnableCPUDebugLogCustomization = new()
+        {
+            Name = "Enable CPU debug log",
+            Group = "OpenVINO CPU Debug",
+            Value = "",
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/plugins/intel_cpu/docs/debug_capabilities/graph_serialization.md#execution-graph",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (!(value is string) || value.ToString() == "") return;
+                AddEnvironmentVariable(ref script, "OV_CPU_DEBUG_LOG", "\"" + value!.ToString() + "\"");
+            }
+        };
+        static public OVCheckCustomization DisableCPUFeatureCustomization = new()
+        {
+            Name = "Disable CPU feature",
+            Group = "OpenVINO CPU Debug",
+            Value = "",
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/plugins/intel_cpu/docs/debug_capabilities/feature_disabling.md",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (!(value is string) || value.ToString() == "") return;
+                AddEnvironmentVariable(ref script, "OV_CPU_DISABLE", "\"" + value!.ToString() + "\"");
+            }
+        };
+        static public OVCheckCustomization EnableCPUAverageCountersCustomization = new()
+        {
+            Name = "Enable CPU Avg counters",
+            Group = "OpenVINO CPU Debug",
+            Value = "",
+            HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/plugins/intel_cpu/docs/debug_capabilities/average_counters.md",
+            Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
+            {
+                if (!(value is string) || value.ToString() == "") return;
+                AddEnvironmentVariable(ref script, "OV_CPU_AVERAGE_COUNTERS", "\"" + value!.ToString() + "\"");
             }
         };
         static private void AddCustomizations(OVCheckDescription item)
@@ -215,7 +289,6 @@ namespace OVChecker
             item.Customizations.Add(PauseBeforeCheckCustomization);
             if (!item.Requirements.Contains("psutil")) item.Requirements += "psutil";
             item.Customizations.Add(PrintResourceConsumptionCustomization);
-            item.Customizations.Add(EnableGPUDumpMemoryPoolCustomization);
             item.Customizations.Add(SerializeCustomization);
             item.Customizations.Add(CompilationDeviceCustomization);
             item.Customizations.Add(EnableProfilePassCustomization);
@@ -223,6 +296,13 @@ namespace OVChecker
             item.Customizations.Add(EnableMatcherLoggingCustomization);
             item.Customizations.Add(SpecifyMatcherLoggingCustomization);
             item.Customizations.Add(EnableTransformationsVerboseLoggingCustomization);
+            item.Customizations.Add(EnableGPUDumpMemoryPoolCustomization);
+            item.Customizations.Add(EnableCPUVerboseCustomization);
+            item.Customizations.Add(EnableCPUExecGraphCustomization);
+            item.Customizations.Add(EnableCPUDumpIRCustomization);
+            item.Customizations.Add(EnableCPUDebugLogCustomization);
+            item.Customizations.Add(DisableCPUFeatureCustomization);
+            item.Customizations.Add(EnableCPUAverageCountersCustomization);
         }
         static public void Register()
         {

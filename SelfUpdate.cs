@@ -149,7 +149,7 @@ namespace OVChecker
                                 {
                                     if (MainWindow.instance != null)
                                     {
-                                        MainWindow.instance.LabelUpdateProgress.Content = "Downloading update: " + (total / (1024 * 1024)).ToString("0.00") + "Mb";
+                                        MainWindow.instance.LabelUpdateProgress.Content = "Downloading update: " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb";
                                         MainWindow.instance.LabelUpdateProgress.Visibility = System.Windows.Visibility.Visible;
                                     }
                                 });

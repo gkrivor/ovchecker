@@ -220,8 +220,16 @@ namespace OVChecker
             System.Windows.Forms.OpenFileDialog openDialog = new()
             {
                 Filter = "Known models|" + allKnownExts + "|All files (*.*)|*.*",
-                DefaultExt = allKnownExts
+                DefaultExt = allKnownExts,
             };
+
+            if(!string.IsNullOrEmpty(CBoxModelPath.Text))
+            {
+                if(System.IO.Directory.Exists(CBoxModelPath.Text))
+                    openDialog.InitialDirectory = CBoxModelPath.Text;
+                else
+                    openDialog.InitialDirectory = System.IO.Path.GetDirectoryName(CBoxModelPath.Text);
+            }
 
             var result = openDialog.ShowDialog();
             if (result != System.Windows.Forms.DialogResult.OK) return;

@@ -26,10 +26,14 @@ namespace OVChecker
             instance = this;
             InitializeComponent();
         }
-        public static void ShowWindow()
+        public static void ShowWindow(string? InitialStatus = null)
         {
             if (instance != null) return;
             instance = new SplashScreen();
+            if (!string.IsNullOrEmpty(InitialStatus))
+            {
+                instance.LabelStatus.Content = InitialStatus;
+            }
             instance.Show();
             System.Windows.Forms.Application.DoEvents();
         }

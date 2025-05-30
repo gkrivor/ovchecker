@@ -10,7 +10,7 @@ using System.Windows.Controls;
 
 namespace OVChecker
 {
-    public partial class MainWindow: Window
+    public partial class MainWindow : Window
     {
         public class ComboBoxBrowseItem : ComboBoxItem
         {
@@ -477,6 +477,101 @@ namespace OVChecker
             {
                 CBoxOpenVINOPath.SelectedIndex = -1;
             }
+        }
+        public bool IsNetronAvailable()
+        {
+            return System.IO.Directory.Exists(WorkDir + "netron-main");
+        }
+
+        public void UpdateNetron()
+        {
+            SplashScreen.ShowWindow("Downloading Netron...");
+            const string netron_url = "https://github.com/lutzroeder/netron/archive/refs/heads/main.zip";
+            string netron_archive = WorkDir + "netron.zip";
+            string netron_path = WorkDir + "netron-main";
+            var update_progress = (int total) =>
+            {
+                SplashScreen.instance!.Dispatcher.Invoke(() =>
+                {
+                    if (SplashScreen.instance != null)
+                    {
+                        SplashScreen.SetStatus("Downloading Netron: " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb");
+                    }
+                });
+            };
+            try
+            {
+                if (System.IO.File.Exists(netron_archive))
+                {
+                    System.IO.File.Delete(netron_archive);
+                }
+                if (!WebRequest.DownloadFile(netron_url, netron_archive, update_progress, true))
+                {
+                    SplashScreen.CloseWindow();
+                    System.Windows.MessageBox.Show("Download failed, please download file " + netron_url + " manually and install into Work Dir");
+                    return;
+                }
+                if (System.IO.Directory.Exists(netron_path))
+                {
+                    System.IO.Directory.Delete(netron_path, true);
+                }
+                SplashScreen.SetStatus("Extracting Netron...");
+                System.IO.Compression.ZipFile.ExtractToDirectory(netron_archive, WorkDir);
+                System.IO.File.Delete(netron_archive);
+#if __INTERNAL_BUILD
+                string browser_source = netron_path + "\\source\\browser.js";
+                if (!System.IO.File.Exists(browser_source)) throw new Exception("browser.js not found, cannot remove telemetry and usage information.");
+                string[] browser_js = System.IO.File.ReadAllLines(browser_source);
+                StringBuilder patched_src = new();
+                bool skip_lines = false;
+                bool telemetry_found = false;
+                foreach (var line in browser_js)
+                {
+                    // Skipping blocks
+                    if (line.Contains("const consent = async ()"))
+                    {
+                        telemetry_found = true;
+                        skip_lines = true;
+                    }
+                    if (line.Contains("const telemetry = async ()"))
+                    {
+                        telemetry_found = true;
+                        skip_lines = true;
+                    }
+                    // Skipping lines
+                    if (line.Contains("await consent();")) continue;
+                    if (line.Contains("await telemetry();")) continue;
+                    if (!skip_lines)
+                    {
+                        patched_src.AppendLine(line);
+                    }
+                    else
+                    {
+                        if (line == "        };") skip_lines = false;
+                    }
+                }
+                if (!telemetry_found) throw new Exception("Telemetry in browser.js is not found, cannot remove telemetry and usage information.");
+                System.IO.File.WriteAllText(browser_source, patched_src.ToString());
+#endif
+                List<AppOutput.ProcessItem> tasks = new();
+                tasks.Add(new() { Name = PythonPath, Args = "\"" + netron_path.Replace("\"", "\\\"") + "\\package.py\" build", WorkingDir = WorkDir, DontStopOnError = false, NoWindow = true });
+                tasks.Add(new() { Name = PythonPath, Args = "-m pip install \"" + netron_path.Replace("\"", "\\\"") + "\\dist\\pypi\" --upgrade", WorkingDir = WorkDir, DontStopOnError = false, NoWindow = true });
+                AppOutput app = new();
+                app.RunProcess("Netron installation", tasks, WorkDir + "netron.log");
+                ButtonOpenNetron.IsEnabled = IsNetronAvailable();
+                ButtonUpdateNetron.Content = "Reload Netron";
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Something went wrong while updating Netron:\n" + ex.Message);
+#if __INTERNAL_BUILD
+                if (System.IO.Directory.Exists(netron_path))
+                {
+                    System.IO.Directory.Delete(netron_path, true);
+                }
+#endif
+            }
+            SplashScreen.CloseWindow();
         }
     }
 }

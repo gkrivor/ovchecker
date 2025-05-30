@@ -33,6 +33,7 @@ namespace OVChecker
         public static string python_bin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "python.exe" : "python";
         public OVFrontends ModelsFrontend { get; set; } = OVFrontends.Any;
         public SelfUpdate UpdateChecker { get; set; } = new();
+        public Process? NetronServer { get; set; } = null;
         public MainWindow()
         {
             instance = this;
@@ -98,6 +99,11 @@ namespace OVChecker
             }
             */
             ShowApplicableChecks();
+            if (IsNetronAvailable())
+            {
+                ButtonOpenNetron.IsEnabled = true;
+                ButtonUpdateNetron.Content = "Reload Netron";
+            }
             ButtonUpdate.Visibility = Visibility.Hidden;
             ButtonNewVersion.Visibility = Visibility.Hidden;
             LabelUpdateProgress.Visibility = Visibility.Hidden;
@@ -223,9 +229,9 @@ namespace OVChecker
                 DefaultExt = allKnownExts,
             };
 
-            if(!string.IsNullOrEmpty(CBoxModelPath.Text))
+            if (!string.IsNullOrEmpty(CBoxModelPath.Text))
             {
-                if(System.IO.Directory.Exists(CBoxModelPath.Text))
+                if (System.IO.Directory.Exists(CBoxModelPath.Text))
                     openDialog.InitialDirectory = CBoxModelPath.Text;
                 else
                     openDialog.InitialDirectory = System.IO.Path.GetDirectoryName(CBoxModelPath.Text);
@@ -326,7 +332,7 @@ namespace OVChecker
         {
             try
             {
-                System.Diagnostics.Process.Start(new ProcessStartInfo((sender as Button)!.Uid) { UseShellExecute = true});
+                System.Diagnostics.Process.Start(new ProcessStartInfo((sender as Button)!.Uid) { UseShellExecute = true });
             }
             catch { }
         }
@@ -393,17 +399,45 @@ namespace OVChecker
             {
                 return;
             }
-            if (!WebRequest.DownloadFile(url, WorkDir + filename, true))
+            var update_progress = (int total) =>
             {
-                System.Windows.MessageBox.Show("Download failed, please download file manually and store as " + filename + " in Work Dir");
-                return;
+                SplashScreen.instance!.Dispatcher.Invoke(() =>
+                {
+                    if (SplashScreen.instance != null)
+                    {
+                        SplashScreen.SetStatus("Downloading Wheel: " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb");
+                    }
+                });
+            };
+            SplashScreen.ShowWindow("Downloading Wheel...");
+            try
+            {
+                if (!WebRequest.DownloadFile(url, WorkDir + filename, update_progress, true))
+                {
+                    System.Windows.MessageBox.Show("Download failed, please download file manually and store as " + filename + " in Work Dir");
+                    return;
+                }
+                MessageBox.Show("Wheel has been downloaded!", "Download Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                SelectOrAddComboBoxItem(CBoxOpenVINOPath, WorkDir + filename);
             }
-            MessageBox.Show("Wheel has been downloaded!", "Download Complete", MessageBoxButton.OK, MessageBoxImage.Information);
-            SelectOrAddComboBoxItem(CBoxOpenVINOPath, WorkDir + filename);
+            catch { }
+            SplashScreen.CloseWindow();
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
+            if (NetronServer != null)
+            {
+                NetronServer.StandardInput.Write(26);
+                NetronServer.StandardInput.Flush();
+                NetronServer.StandardInput.Close();
+                try
+                {
+                    System.Threading.Thread.Sleep(200);
+                    NetronServer.Kill();
+                }
+                catch { }
+            }
             UpdateChecker.Stop();
             foreach (var wnd in Application.Current.Windows)
             {
@@ -534,7 +568,7 @@ namespace OVChecker
             }
             else if (action == "pip_install")
             {
-                if(string.IsNullOrEmpty(TextPipInstall.Text))
+                if (string.IsNullOrEmpty(TextPipInstall.Text))
                 {
                     MessageBox.Show("Please, enter a list of PyPi packages into the text box", "Empty packages", MessageBoxButton.OK, MessageBoxImage.Information);
                     TextPipInstall.Focus();
@@ -543,6 +577,53 @@ namespace OVChecker
                 AppOutput app = new();
                 tasks.Add(new() { Name = python_path, Args = "-m pip list", WorkingDir = WorkDir, CustomEnvVars = custom_env, NoWindow = true });
                 app.RunProcess("pip install " + TextPipInstall.Text, tasks, WorkDir + "pip.log");
+            }
+        }
+
+        private void ButtonNetron_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button)) return;
+            string action = (sender as Button)!.Uid;
+            List<AppOutput.ProcessItem> tasks = new();
+
+            if (action == "open")
+            {
+                if(!IsNetronAvailable())
+                {
+                    MessageBox.Show("Netron isn\'t detected, press \"Download Netron\" button to download and install Netron for the chosen Python");
+                    ButtonOpenNetron.IsEnabled = false;
+                    return;
+                }
+
+                //                AppControl app = new();
+                //                app.RunProcess(PythonPath, "-c \"import netron; netron.main()\"", WorkDir);
+                if (NetronServer != null)
+                {
+                    Process.Start("explorer.exe", "http://localhost:8001");
+                }
+                else
+                {
+                    NetronServer = new Process();
+                    NetronServer.StartInfo.FileName = PythonPath;
+                    NetronServer.StartInfo.Arguments = "-c \"import netron; netron.main()\" -p 8001";
+                    NetronServer.StartInfo.WorkingDirectory = WorkDir;
+                    NetronServer.StartInfo.UseShellExecute = false;
+                    NetronServer.StartInfo.RedirectStandardInput = true;
+                    NetronServer.StartInfo.CreateNoWindow = true;
+                    NetronServer.Start();
+                    System.Threading.Thread.Sleep(200);
+                    if(NetronServer.HasExited)
+                    {
+                        MessageBox.Show("Something wrong went with starting Netron. You may need to reboot your PC.");
+                        NetronServer = null;
+                        return;
+                    }
+                    Process.Start("explorer.exe", "http://localhost:8001");
+                }
+            }
+            else if (action == "update")
+            {
+                UpdateNetron();
             }
         }
     }

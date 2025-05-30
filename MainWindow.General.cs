@@ -344,10 +344,31 @@ namespace OVChecker
                 string python_path = WorkDir + item.Path;
                 if (item.Content.ToString()!.StartsWith("Download "))
                 {
+                    var python_progress = (int total) =>
+                    {
+                        SplashScreen.instance!.Dispatcher.Invoke(() =>
+                        {
+                            if (SplashScreen.instance != null)
+                            {
+                                SplashScreen.SetStatus("Downloading Python: " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb");
+                            }
+                        });
+                    };
+                    var pypi_progress = (int total) =>
+                    {
+                        SplashScreen.instance!.Dispatcher.Invoke(() =>
+                        {
+                            if (SplashScreen.instance != null)
+                            {
+                                SplashScreen.SetStatus("Downloading PyPi: " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb");
+                            }
+                        });
+                    };
+                    SplashScreen.ShowWindow("Downloading Python...");
                     string python_archive = python_path + ".zip";
                     if (!System.IO.File.Exists(python_archive))
                     {
-                        if (!WebRequest.DownloadFile(item.URL, python_archive, true))
+                        if (!WebRequest.DownloadFile(item.URL, python_archive, python_progress, true))
                         {
                             System.Windows.MessageBox.Show("Download failed, please download file " + item.URL + " manually and store as " + item.Path + ".zip in Work Dir");
                             return;
@@ -362,12 +383,13 @@ namespace OVChecker
                     if (!System.IO.File.Exists(pip_archive))
                     {
                         string pip_installer = "https://bootstrap.pypa.io/pip/pip.pyz";
-                        if (!WebRequest.DownloadFile(pip_installer, pip_archive, true))
+                        if (!WebRequest.DownloadFile(pip_installer, pip_archive, pypi_progress, true))
                         {
                             System.Windows.MessageBox.Show("Download failed, please download file " + pip_installer + " manually and store as pip.pyz in Work Dir");
                             return;
                         }
                     }
+                    SplashScreen.CloseWindow();
                     if (System.IO.File.Exists(pip_archive) && !System.IO.Directory.Exists(python_path + "\\Lib\\site-packages\\pip"))
                     {
                         AppOutput appOutput = new();

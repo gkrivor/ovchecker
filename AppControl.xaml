@@ -11,8 +11,8 @@
         <Label Content="Executable:" x:Name="LabelExecutable" Margin="10,41,10,0" VerticalAlignment="Top"/>
         <Label Content="Initial Working dir:" x:Name="LabelWorkingDir" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top" ToolTip="Double click to open folder" MouseDoubleClick="LabelWorkingDir_MouseDoubleClick" Cursor="Hand"/>
         <Label Content="Arguments:" HorizontalAlignment="Left" Margin="10,94,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="ExecutableArgs" Height="74" Margin="10,125,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" VerticalScrollBarVisibility="Visible" FontSize="10"/>
-        <Button Content="Kill Process" Margin="360,204,360,0" VerticalAlignment="Top" Click="Button_Click"/>
+        <TextBox x:Name="ExecutableArgs" Margin="10,125,10,35" TextWrapping="Wrap" Text="" VerticalScrollBarVisibility="Visible" FontSize="10"/>
+        <Button Content="Kill Process" Margin="360,0,360,10" Click="Button_Click" Height="20" VerticalAlignment="Bottom"/>
 
     </Grid>
 </Window>

@@ -44,7 +44,7 @@
                         <Expander Header="Netron" IsExpanded="True">
                             <Grid>
                                 <Button x:Name="ButtonOpenNetron" IsEnabled="False" Content="Open Netron" Margin="10,10,0,10" VerticalAlignment="Top" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="open"/>
-                                <Button x:Name="ButtonUpdateNetron" Content="Download Netron" Margin="123,0,0,0" VerticalAlignment="Center" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="update"/>
+                                <Button x:Name="ButtonUpdateNetron" Content="Download Netron" Margin="0,0,10,0" VerticalAlignment="Center" Click="ButtonNetron_Click" HorizontalAlignment="Right" Width="108" Uid="update"/>
                             </Grid>
                         </Expander>
                     </StackPanel>

@@ -293,7 +293,7 @@ namespace OVChecker
                     new Action(() =>
                     {
                         ProcessLog.BeginChange();
-                        if (ProcessLog.Text.Length < OutputBufCapacity)
+                        if (ProcessLog.Text.Length < OutputBufCapacity && OutputLogLength <= OutputBufCapacity)
                         {
                             ProcessLog.AppendText(show_data);
                         }

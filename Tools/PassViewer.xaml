@@ -1,0 +1,59 @@
+﻿<Window x:Class="OVChecker.Tools.PassViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OVChecker.Tools"
+        mc:Ignorable="d"
+        Title="PassViewer" Height="450" Width="800">
+    <Grid>
+        <Menu VerticalAlignment="Top">
+            <MenuItem Header="_File">
+                <MenuItem x:Name="MnuOpen" Header="_Open..." Click="MnuOpen_Click"/>
+                <Separator/>
+                <MenuItem x:Name="MnuClose" Header="_Close" Click="MnuClose_Click"/>
+            </MenuItem>
+        </Menu>
+        <ToolBar Height="32" VerticalAlignment="Top" Margin="-2,18,2,0">
+            <Label Content="Filter passes: "/>
+            <TextBox x:Name="TextFilter" Margin="0,2,0,3" Width="256" KeyUp="TextFilter_KeyUp"/>
+            <Button Content="Filter" x:Name="BtnFilter" Click="BtnFilter_Click"/>
+        </ToolBar>
+        <ListView x:Name="ListViewPasses" Margin="0,50,5,2">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Pass">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PassName}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Name">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Millis">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Milliseconds}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+            <!--ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle-->
+        </ListView>
+    </Grid>
+</Window>

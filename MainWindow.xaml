@@ -41,10 +41,16 @@
                                 <Button x:Name="ButtonDownloadWheel" Content="Download" Margin="0,40,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="108" Click="ButtonDownloadWheel_Click"/>
                             </Grid>
                         </Expander>
-                        <Expander Header="Netron" IsExpanded="True">
+                        <Expander Header="Tools" IsExpanded="True">
                             <Grid>
-                                <Button x:Name="ButtonOpenNetron" IsEnabled="False" Content="Open Netron" Margin="10,10,0,10" VerticalAlignment="Top" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="open"/>
-                                <Button x:Name="ButtonUpdateNetron" Content="Download Netron" Margin="0,0,10,0" VerticalAlignment="Center" Click="ButtonNetron_Click" HorizontalAlignment="Right" Width="108" Uid="update"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="67*"/>
+                                    <ColumnDefinition Width="121*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="ButtonOpenNetron" IsEnabled="False" Content="Open Netron" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="open"/>
+                                <Button x:Name="ButtonUpdateNetron" Content="Download Netron" Margin="366,0,0,0" VerticalAlignment="Center" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="update" Grid.Column="1"/>
+                                <Button x:Name="ButtonPassViewer" Content="Open PassViewer" Margin="10,35,10,0" VerticalAlignment="Top" Click="ButtonPassViewer_Click" HorizontalAlignment="Left" Width="108"/>
+                                <Button x:Name="ButtonMatchesViewer" Content="Open MatchesViewer" Margin="123,35,0,0" VerticalAlignment="Top" Click="ButtonMatchesViewer_Click" HorizontalAlignment="Left" Width="108"/>
                             </Grid>
                         </Expander>
                     </StackPanel>

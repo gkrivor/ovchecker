@@ -21,6 +21,7 @@ using System.Windows.Threading;
 using System.Collections.Generic;
 using System;
 using System.Runtime.InteropServices;
+using OVChecker.Tools;
 
 namespace OVChecker
 {
@@ -625,6 +626,18 @@ namespace OVChecker
             {
                 UpdateNetron();
             }
+        }
+
+        private void ButtonPassViewer_Click(object sender, RoutedEventArgs e)
+        {
+            PassViewer passViewer = new PassViewer();
+            passViewer.Show();
+        }
+
+        private void ButtonMatchesViewer_Click(object sender, RoutedEventArgs e)
+        {
+            MatchesViewer matchesViewer = new MatchesViewer();
+            matchesViewer.Show();
         }
     }
 }

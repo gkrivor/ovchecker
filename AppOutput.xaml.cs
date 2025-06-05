@@ -27,9 +27,7 @@ namespace OVChecker
         private StreamWriter? outputLog = null;
         public bool IsWorkflowFinished = true;
         public bool ThreadStop = false;
-        private const int OutputBufCapacity = 1024 * 1024;
-        private const int OutputLogCapacity = 25 * 1024 * 1024;
-        private bool OutputLogOverflow = false;
+        private const int OutputBufCapacity = 128 * 1024;
         private long OutputLogLength = 0;
         private StringBuilder OutputBuf = new(OutputBufCapacity);
         private long LastOutputFlush = 0;

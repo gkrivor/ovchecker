@@ -121,20 +121,31 @@ namespace OVChecker.Tools
             Passes.Clear();
             StringBuilder src_text = new();
             List<string> pass_path = new();
+            SplashScreen.ShowWindow("Parsing log...");
             using (var src_file = System.IO.File.OpenRead(filename))
             {
                 byte[] buffer = new byte[128 * 1024];
                 string? pass_name = null;
 
-                int read = 0;
+                var file_info = new System.IO.FileInfo(filename);
+                long read = 0, total = 0, file_size = file_info.Length;
+                int last_percent = 0, new_percent;
                 while ((read = src_file.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     src_text.Append(Encoding.ASCII.GetString(buffer));
+                    total += read;
                     ParseBlock(ref src_text, ref pass_name, ref pass_path);
+                    new_percent = (int)(total * 100 / file_size);
+                    if (new_percent > last_percent)
+                    {
+                        last_percent = new_percent;
+                        SplashScreen.SetStatus("Parsing done for " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb or " + last_percent + "%");
+                    }
                 }
                 if (src_text.Length > 0)
                     ParseBlock(ref src_text, ref pass_name, ref pass_path, true);
             }
+            SplashScreen.CloseWindow();
         }
 
         private void MnuOpen_Click(object sender, RoutedEventArgs e)

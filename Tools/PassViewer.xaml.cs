@@ -24,6 +24,9 @@ namespace OVChecker.Tools
     /// </summary>
     public partial class PassViewer : Window
     {
+        private System.Threading.Thread? ParsingThread = null;
+        public bool StopThread = false;
+        public string source_file = string.Empty;
         public class OVPassItem : INotifyPropertyChanged
         {
             public string Name { get; set; }
@@ -100,7 +103,11 @@ namespace OVChecker.Tools
                         {
                             group_name += " Parsing Error";
                         }
-                        Passes.Add(new() { Name = group_name, Milliseconds = int.Parse(match.Groups[2].Value), State = match.Groups[3].Value, PassName = string.Join(" \\ ", pass_path) });
+                        var local_pass_path = string.Join(" \\ ", pass_path);
+                        Dispatcher.Invoke(() =>
+                        {
+                            Passes.Add(new() { Name = group_name, Milliseconds = int.Parse(match.Groups[2].Value), State = match.Groups[3].Value, PassName = local_pass_path });
+                        });
                     }
                     if (pass_path.Count > 0)
                         pass_path.RemoveAt(pass_path.Count - 1);
@@ -111,20 +118,32 @@ namespace OVChecker.Tools
                     var match = Regex.Match(line.Substring(25), @"([^ ]+)\s*([0-9]+)ms\s*([+-])");
                     if (match.Success)
                     {
-                        Passes.Add(new() { Name = match.Groups[1].Value, Milliseconds = int.Parse(match.Groups[2].Value), State = match.Groups[3].Value, PassName = string.Join(" \\ ", pass_path) });
+                        var local_pass_path = string.Join(" \\ ", pass_path);
+                        Dispatcher.Invoke(() =>
+                        {
+                            Passes.Add(new() { Name = match.Groups[1].Value, Milliseconds = int.Parse(match.Groups[2].Value), State = match.Groups[3].Value, PassName = local_pass_path });
+                        });
                     }
                 }
             } while (n_pos > -1);
         }
         public void ParseFile(string filename)
         {
-            Passes.Clear();
+            source_file = filename;
+            var thread_parameters = new System.Threading.ThreadStart(delegate { ParseFileInternal(filename); });
+            ParsingThread = new System.Threading.Thread(thread_parameters);
+            ParsingThread.Start();
+        }
+        public void ParseFileInternal(string filename)
+        {
+            Dispatcher.Invoke(() => { Passes.Clear(); });
+            Dispatcher.Invoke(() => { SplashScreen.ShowWindow("Parsing log..."); });
+
             StringBuilder src_text = new();
             List<string> pass_path = new();
-            SplashScreen.ShowWindow("Parsing log...");
             using (var src_file = System.IO.File.OpenRead(filename))
             {
-                byte[] buffer = new byte[128 * 1024];
+                byte[] buffer = new byte[32 * 1024];
                 string? pass_name = null;
 
                 var file_info = new System.IO.FileInfo(filename);
@@ -139,13 +158,16 @@ namespace OVChecker.Tools
                     if (new_percent > last_percent)
                     {
                         last_percent = new_percent;
-                        SplashScreen.SetStatus("Parsing done for " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb or " + last_percent + "%");
+                        SplashScreen.instance!.Dispatcher.Invoke(() =>
+                        {
+                            SplashScreen.SetStatus("Parsing done for " + ((float)total / (1024 * 1024)).ToString("0.00") + "Mb or " + last_percent + "%");
+                        });
                     }
                 }
                 if (src_text.Length > 0)
                     ParseBlock(ref src_text, ref pass_name, ref pass_path, true);
             }
-            SplashScreen.CloseWindow();
+            Dispatcher.Invoke(() => { SplashScreen.CloseWindow(); });
         }
 
         private void MnuOpen_Click(object sender, RoutedEventArgs e)

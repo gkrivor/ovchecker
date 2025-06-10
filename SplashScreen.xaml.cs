@@ -40,8 +40,12 @@ namespace OVChecker
         public static async void SetStatus(string status)
         {
             if (instance == null) return;
-            instance.LabelStatus.Content = status;
-            instance.InvalidateVisual();
+            instance.Dispatcher.Invoke(() =>
+            {
+                if(instance == null) return;
+                instance.LabelStatus.Content = status;
+                instance.InvalidateVisual();
+            });
             System.Windows.Forms.Application.DoEvents();
         }
         public static void CloseWindow()

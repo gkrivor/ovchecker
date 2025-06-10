@@ -240,7 +240,56 @@ namespace OVChecker.Tools
                 byte[] bytes = new byte[do_item.DataLength];
                 src_file.Read(bytes, 0, bytes.Length);
                 TextSource.Text = Encoding.ASCII.GetString(bytes);
+                ColorizeOutput(TextSource.Text);
             }
+        }
+        private void ColorizeOutput(string text)
+        {
+            Regex reMatchName = new Regex(@"\[[^\]]+\]", RegexOptions.Compiled);
+
+            var doc = new FlowDocument();
+            doc.LineHeight = 1.0;
+            foreach(var line in text.Split("\n"))
+            {
+                var paragraph = new Paragraph();
+                var rline = line.TrimEnd().Replace("  ", " ").Replace("?", "");
+                if (rline.Trim() == "") continue;
+                foreach (var txt in rline.Split(" "))
+                {
+                    if (txt == "{" || txt == "}")
+                    {
+                        paragraph.Inlines.Add(new Run(txt + " ") { Foreground = Brushes.Green });
+                    }
+                    else if (txt == "MATCHED")
+                    {
+                        paragraph.Inlines.Add(new Run(txt + " ") { Foreground = Brushes.Green, FontWeight = FontWeights.Bold });
+                    }
+                    else if (txt == "DIDN'T")
+                    {
+                        paragraph.Inlines.Add(new Run(txt + " ") { Foreground = Brushes.Maroon, FontWeight = FontWeights.Bold });
+                    }
+                    else if (txt == "ARGUMENT" || txt == "BRANCH" || txt == "PERMUTATION")
+                    {
+                        paragraph.Inlines.Add(new Run(txt + " ") { Foreground = Brushes.Navy });
+                    }
+                    else if (txt.Contains("NODE"))
+                    {
+                        paragraph.Inlines.Add(new Run(txt + " ") { Foreground = Brushes.Navy, FontWeight = FontWeights.Bold });
+                    }
+                    else if (reMatchName.IsMatch(txt))
+                    {
+                        paragraph.Inlines.Add(new Run("["));
+                        paragraph.Inlines.Add(new Run(txt.Substring(1, txt.Length - 2)) { Foreground = Brushes.Gold, FontWeight = FontWeights.Bold });
+                        paragraph.Inlines.Add(new Run("] "));
+                    }
+                    else
+                    {
+                        paragraph.Inlines.Add(new Run(txt + " "));
+                    }
+                }
+                doc.Blocks.Add(paragraph);
+            }
+            TextHighlight.Document = doc;
         }
         private void ParseBlock(ref StringBuilder src_text, ref DataOffsetItem? current, ref long offset, bool is_last_block = false)
         {
@@ -338,7 +387,6 @@ namespace OVChecker.Tools
 
             Dispatcher.Invoke(() => { RenderGroups(); SplashScreen.CloseWindow(); });
         }
-
         private void MnuOpen_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.OpenFileDialog openDialog = new()
@@ -352,22 +400,19 @@ namespace OVChecker.Tools
 
             ParseFile(openDialog.FileName);
         }
-
         private void MnuClose_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
-
         private void BtnFilter_Click(object sender, RoutedEventArgs e)
         {
+            RenderGroups();
         }
-
         private void TextFilter_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
                 BtnFilter_Click(sender, new());
         }
-
         private void Window_Closed(object sender, EventArgs e)
         {
             RootItems = null;

@@ -30,8 +30,8 @@
         </ToolBar>
         <TreeView x:Name="TreeViewMatches" Margin="0,0,5,0" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"/>
         <GridSplitter Width="5" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2"/>
-        <ListView Grid.Row="1" Grid.Column="1"/>
+        <RichTextBox x:Name="TextHighlight" Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
         <GridSplitter Height="5" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Margin="0,142,0,235" Grid.RowSpan="2" Cursor="ScrollWE"/>
-        <TextBox x:Name="TextSource" Grid.Row="2" Grid.Column="1" Margin="0,5,0,0" UndoLimit="0" IsUndoEnabled="False"/>
+        <TextBox x:Name="TextSource" Grid.Row="2" Grid.Column="1" Margin="0,5,0,0" UndoLimit="0" IsUndoEnabled="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
     </Grid>
 </Window>

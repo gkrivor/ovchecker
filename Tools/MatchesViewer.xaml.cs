@@ -52,7 +52,6 @@ namespace OVChecker.Tools
                 if (id < 0) return string.Empty;
                 return MatcherName.FirstOrDefault(x => x.Value == id).Key;
             }
-
             public int GetTypeId(string name, bool create = false)
             {
                 int id = -1;
@@ -70,7 +69,6 @@ namespace OVChecker.Tools
                 if (id < 0) return string.Empty;
                 return NodeType.FirstOrDefault(x => x.Value == id).Key;
             }
-
             public int GetNameId(string name, bool create = false)
             {
                 int id = -1;
@@ -87,6 +85,26 @@ namespace OVChecker.Tools
             {
                 if (id < 0) return string.Empty;
                 return NodeName.FirstOrDefault(x => x.Value == id).Key;
+            }
+            private void FindApplicableItems(string text, ref Dictionary<string, int> dict, ref List<int> output)
+            {
+                foreach(var item in dict.Keys)
+                {
+                    if(item.Contains(text, StringComparison.InvariantCultureIgnoreCase))
+                        output.Add(dict[item]);
+                }
+            }
+            public void FindMatches(string text, ref List<int> output)
+            {
+                FindApplicableItems(text, ref MatcherName, ref output);
+            }
+            public void FindTypes(string text, ref List<int> output)
+            {
+                FindApplicableItems(text, ref NodeType, ref output);
+            }
+            public void FindNodes(string text, ref List<int> output)
+            {
+                FindApplicableItems(text, ref NodeName, ref output);
             }
 
             public ItemsDictionary() { }
@@ -107,6 +125,9 @@ namespace OVChecker.Tools
             private int _MatcherName = -1;
             private int _NodeType = -1;
             private int _NodeName = -1;
+            public int GetMatcherId() { return _MatcherName; }
+            public int GetTypeId() { return _NodeType; }
+            public int GetNodeId() { return _NodeName; }
             public string MatcherName
             {
                 get { return Dictionary.GetMatcherName(_MatcherName); }
@@ -150,6 +171,9 @@ namespace OVChecker.Tools
         private List<DataOffsetItem>? RootItems { get; set; } = null;
         private ItemsDictionary CurrentDictionary { get; set; } = new();
         private BitmapImage ImageOKSource { get; set; } = new();
+
+        private List<int> MatcherIDs = new(), TypeIDs = new(), NodeIDs = new();
+
         public MatchesViewer()
         {
             InitializeComponent();
@@ -174,7 +198,6 @@ namespace OVChecker.Tools
         }
         private void FillGroups(ref List<string> groups)
         {
-            SplashScreen.ShowWindow("Applying filter...");
             if (IsFilterApplied())
             {
                 foreach (var item in RootItems!)
@@ -196,7 +219,6 @@ namespace OVChecker.Tools
                     }
                 }
             }
-            SplashScreen.CloseWindow();
         }
         private bool IsFilterApplied()
         {
@@ -206,7 +228,10 @@ namespace OVChecker.Tools
         {
             bool isnt_filtered = true;
             if (!string.IsNullOrEmpty(TextFilter.Text))
-                isnt_filtered &= item.MatcherName.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase) || item.NodeName.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase) || item.NodeType.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase);
+            {
+                //isnt_filtered &= item.MatcherName.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase) || item.NodeName.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase) || item.NodeType.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase);
+                isnt_filtered &= MatcherIDs.Contains(item.GetMatcherId()) || TypeIDs.Contains(item.GetTypeId()) || NodeIDs.Contains(item.GetNodeId());
+            }
             if (CheckOnlyMatched.IsChecked == true)
                 isnt_filtered &= item.IsDidntMatch == false;
             return !isnt_filtered;
@@ -284,7 +309,7 @@ namespace OVChecker.Tools
 
             var doc = new FlowDocument();
             doc.LineHeight = 1.0;
-            foreach(var line in text.Split("\n"))
+            foreach (var line in text.Split("\n"))
             {
                 var paragraph = new Paragraph();
                 bool is_skip_line = false;
@@ -446,6 +471,13 @@ namespace OVChecker.Tools
         }
         private void BtnFilter_Click(object sender, RoutedEventArgs e)
         {
+            /* Preparing list of applicable IDs for faster filtering */
+            MatcherIDs.Clear();
+            TypeIDs.Clear();
+            NodeIDs.Clear();
+            CurrentDictionary.FindMatches(TextFilter.Text, ref MatcherIDs);
+            CurrentDictionary.FindTypes(TextFilter.Text, ref TypeIDs);
+            CurrentDictionary.FindNodes(TextFilter.Text, ref NodeIDs);
             RenderGroups();
         }
         private void TextFilter_KeyUp(object sender, KeyEventArgs e)

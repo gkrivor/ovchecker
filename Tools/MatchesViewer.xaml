@@ -26,7 +26,8 @@
         <ToolBar Height="32" VerticalAlignment="Top" Margin="-2,18,2,0" Grid.ColumnSpan="2">
             <Label Content="Filter passes: "/>
             <TextBox x:Name="TextFilter" Margin="0,2,0,3" Width="256" KeyUp="TextFilter_KeyUp"/>
-            <Button Content="Filter" x:Name="BtnFilter" Click="BtnFilter_Click"/>
+            <CheckBox x:Name="CheckOnlyMatched" Content="Show only matched"/>
+            <Button Content="Filter" x:Name="BtnFilter" Margin="10,0,0,0" Click="BtnFilter_Click"/>
         </ToolBar>
         <TreeView x:Name="TreeViewMatches" Margin="0,0,5,0" Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"/>
         <GridSplitter Width="5" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2"/>

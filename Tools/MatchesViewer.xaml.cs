@@ -162,13 +162,7 @@ namespace OVChecker.Tools
             TreeViewMatches.Items.Clear();
             if (RootItems == null) return;
             List<string> groups = new();
-            foreach (var item in RootItems!)
-            {
-                if (!groups.Contains(item.MatcherName))
-                {
-                    groups.Add(item.MatcherName);
-                }
-            }
+            FillGroups(ref groups);
             groups.Sort();
             foreach (var item in groups)
             {
@@ -177,6 +171,45 @@ namespace OVChecker.Tools
                 root_item.Expanded += RootItem_Expanded;
                 TreeViewMatches.Items.Add(root_item);
             }
+        }
+        private void FillGroups(ref List<string> groups)
+        {
+            SplashScreen.ShowWindow("Applying filter...");
+            if (IsFilterApplied())
+            {
+                foreach (var item in RootItems!)
+                {
+                    if (IsItemFiltered(item)) continue;
+                    if (!groups.Contains(item.MatcherName))
+                    {
+                        groups.Add(item.MatcherName);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in RootItems!)
+                {
+                    if (!groups.Contains(item.MatcherName))
+                    {
+                        groups.Add(item.MatcherName);
+                    }
+                }
+            }
+            SplashScreen.CloseWindow();
+        }
+        private bool IsFilterApplied()
+        {
+            return !string.IsNullOrEmpty(TextFilter.Text) || CheckOnlyMatched.IsChecked == true;
+        }
+        private bool IsItemFiltered(DataOffsetItem item)
+        {
+            bool isnt_filtered = true;
+            if (!string.IsNullOrEmpty(TextFilter.Text))
+                isnt_filtered &= item.MatcherName.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase) || item.NodeName.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase) || item.NodeType.Contains(TextFilter.Text, StringComparison.InvariantCultureIgnoreCase);
+            if (CheckOnlyMatched.IsChecked == true)
+                isnt_filtered &= item.IsDidntMatch == false;
+            return !isnt_filtered;
         }
         private void RootItem_Expanded(object sender, RoutedEventArgs e)
         {
@@ -187,6 +220,7 @@ namespace OVChecker.Tools
             foreach (var item in RootItems!)
             {
                 if (item.MatcherName != matcher_name) continue;
+                if (IsFilterApplied() && IsItemFiltered(item)) continue;
                 if (!groups.Contains(item.NodeType))
                 {
                     groups.Add(item.NodeType);
@@ -213,6 +247,7 @@ namespace OVChecker.Tools
             foreach (var item in RootItems!)
             {
                 if (item.MatcherName != matcher_name || item.NodeType != node_type) continue;
+                if (IsFilterApplied() && IsItemFiltered(item)) continue;
                 var match_node = new DOTreeViewItem(false) { Item = item };
                 if (item.IsDidntMatch == false)
                 {
@@ -252,8 +287,10 @@ namespace OVChecker.Tools
             foreach(var line in text.Split("\n"))
             {
                 var paragraph = new Paragraph();
+                bool is_skip_line = false;
                 var rline = line.TrimEnd().Replace("  ", " ").Replace("?", "");
                 if (rline.Trim() == "") continue;
+                if (rline.StartsWith("[DEBUG]")) continue;
                 foreach (var txt in rline.Split(" "))
                 {
                     if (txt == "{" || txt == "}")
@@ -287,7 +324,10 @@ namespace OVChecker.Tools
                         paragraph.Inlines.Add(new Run(txt + " "));
                     }
                 }
-                doc.Blocks.Add(paragraph);
+                if (!is_skip_line)
+                {
+                    doc.Blocks.Add(paragraph);
+                }
             }
             TextHighlight.Document = doc;
         }

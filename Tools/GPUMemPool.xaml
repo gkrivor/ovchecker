@@ -14,7 +14,9 @@
                 <MenuItem x:Name="MnuClose" Header="_Close" Click="MnuClose_Click"/>
             </MenuItem>
         </Menu>
-        <Image x:Name="Img" Margin="0,20,0,120"/>
+        <ScrollViewer Margin="0,20,0,120">
+        <Image x:Name="Img" Margin="0,0,0,0" Stretch="None" Width="Auto" Height="Auto"/>
+        </ScrollViewer>
         <TextBox x:Name="TextLog" UndoLimit="0" IsUndoEnabled="False" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Height="119" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

@@ -79,7 +79,7 @@ def parse_file(file_name, output_file):
         drawing.text([w - txt_w, y], txt, colors[item])
         y += 10
     
-    graph.save(output_file, "JPEG")
+    graph.save(output_file, "JPEG", subsampling=0, quality=95)
 
 if __name__ == "__main__":
     file_path = None

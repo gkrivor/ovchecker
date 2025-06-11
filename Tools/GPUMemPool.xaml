@@ -1,0 +1,20 @@
+﻿<Window x:Class="OVChecker.Tools.GPUMemPool"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OVChecker.Tools"
+        mc:Ignorable="d"
+        Title="GPU Mem Pool" Height="450" Width="800">
+    <Grid>
+        <Menu VerticalAlignment="Top">
+            <MenuItem Header="_File">
+                <MenuItem x:Name="MnuOpen" Header="_Open..." Click="MnuOpen_Click"/>
+                <Separator/>
+                <MenuItem x:Name="MnuClose" Header="_Close" Click="MnuClose_Click"/>
+            </MenuItem>
+        </Menu>
+        <Image x:Name="Img" Margin="0,20,0,120"/>
+        <TextBox x:Name="TextLog" UndoLimit="0" IsUndoEnabled="False" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Height="119" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>

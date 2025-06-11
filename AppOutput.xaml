@@ -21,8 +21,17 @@
                 <Separator/>
                 <MenuItem x:Name="MnuFolders" Header="Working _folders..."/>
             </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="_Transformations">
+                    <MenuItem Header="_Matches Log Parser" Click="MnuTools_Click" Uid="matches_viewer"/>
+                    <MenuItem Header="Passes Log Parser" Click="MnuTools_Click" Uid="pass_viewer"/>
+                </MenuItem>
+                <MenuItem Header="_GPU Plugin">
+                    <MenuItem Header="_Memory Pool Visualization" Click="MnuTools_Click" Uid="gpu_mem_pool"/>
+                </MenuItem>
+            </MenuItem>
         </Menu>
-        <TextBox x:Name="ProcessLog" TextWrapping="NoWrap" Text="" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,22,0,32" VerticalAlignment="Stretch" IsReadOnly="True" IsReadOnlyCaretVisible="True" IsInactiveSelectionHighlightEnabled="True" FontFamily="Courier New" AcceptsTab="True" KeyDown="ProcessLog_KeyDown" UndoLimit="0" IsUndoEnabled="False"/>
+        <TextBox x:Name="ProcessLog" TextWrapping="NoWrap" Text="" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="0,22,0,32" IsReadOnly="True" IsReadOnlyCaretVisible="True" IsInactiveSelectionHighlightEnabled="True" FontFamily="Courier New" AcceptsTab="True" KeyDown="ProcessLog_KeyDown" UndoLimit="0" IsUndoEnabled="False"/>
         <ToolBar Height="32" VerticalAlignment="Bottom">
             <Button Content="Open log folder..." x:Name="BtnOpenLogFolder" Margin="0,0,10,0" Click="BtnOpenLogFolder_Click"/>
             <Label Content="Search text in current scope: "/>

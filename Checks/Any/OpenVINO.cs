@@ -75,6 +75,7 @@ namespace OVChecker
             Group = "OpenVINO Transformations Debug",
             Value = false,
             HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/transformation_statistics_collection.md",
+            ForceTools = "PassViewer;",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
@@ -154,6 +155,7 @@ namespace OVChecker
             Group = "OpenVINO Transformations Debug",
             Value = false,
             HelpURL = "https://github.com/openvinotoolkit/openvino/blob/master/src/common/transformations/docs/debug_capabilities/matcher_logging.md",
+            ForceTools = "MatcherViewer;",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;
@@ -190,6 +192,7 @@ namespace OVChecker
             Name = "Enable GPU Dump Memory Pool",
             Group = "OpenVINO GPU Debug",
             Value = false,
+            ForceTools = "GPUMemUsageMap;",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
                 if (bool.Parse(value!.ToString()!) != true) return;

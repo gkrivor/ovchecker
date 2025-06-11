@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using OVChecker.Tools;
 
 namespace OVChecker
 {
@@ -52,8 +53,10 @@ namespace OVChecker
             public bool NoWindow { get; set; }
             public string Uid { get; set; }
             public object? ItemSource { get; set; }
+            // List of forced tool buttons delimited by ";"
+            public string ForcedTools { get; set; }
 
-            public ProcessItem() { Name = ""; Args = ""; WorkingDir = ""; DontStopOnError = false; Uid = ""; NoWindow = false; }
+            public ProcessItem() { Name = ""; Args = ""; WorkingDir = ""; DontStopOnError = false; Uid = ""; NoWindow = false; ForcedTools = ""; }
             public string toString()
             {
                 return Name + Args + WorkingDir + CustomEnvVars;
@@ -533,6 +536,29 @@ namespace OVChecker
         {
             if (!(sender is Button)) { return; }
             System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + ((sender as Button)!.Uid.ToString() ?? "").Replace("\"", "\\\"") + "\"");
+        }
+
+        private void MnuTools_Click(object sender, RoutedEventArgs e)
+        {
+            var action = (sender as Control)!.Uid;
+            if(action == "matches_viewer")
+            {
+                MatchesViewer matchesViewer = new MatchesViewer();
+                matchesViewer.Show();
+                matchesViewer.ParseFile(OutputLogPath);
+            }
+            else if(action == "pass_viewer")
+            {
+                PassViewer passViewer = new PassViewer();
+                passViewer.Show();
+                passViewer.ParseFile(OutputLogPath);
+            }
+            else if (action == "gpu_mem_pool")
+            {
+                GPUMemPool gpuMemPool = new GPUMemPool();
+                gpuMemPool.Show();
+                gpuMemPool.ParseFile(OutputLogPath);
+            }
         }
     }
 }

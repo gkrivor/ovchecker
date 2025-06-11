@@ -225,25 +225,27 @@ namespace OVChecker
                 }
             }
 
+            string forced_tools = "";
             // Apply customizations
             var description = OVChecksDescriptions.GetDescriptionByGUID(item.GUID);
             if (description != null)
             {
-                var apply_customization = (Panel panel) =>
+                var apply_customization = (Panel Panel, ref string ForcedTools) =>
                 {
                     foreach (var custom in description.Customizations)
                     {
-                        if (custom.GUID != panel!.Uid) continue;
+                        if (custom.GUID != Panel!.Uid) continue;
                         if (custom.Handler == null) continue;
                         if (custom_env == null) custom_env = "";
+                        ForcedTools += custom.ForceTools;
                         if (custom.Value is bool)
                         {
-                            var cb = panel.Children[1] as System.Windows.Controls.CheckBox;
+                            var cb = Panel.Children[1] as System.Windows.Controls.CheckBox;
                             custom.Handler(custom, cb!.IsChecked, ref script, ref custom_env);
                         }
                         else if (custom.Value is string)
                         {
-                            var tb = panel.Children[1] as System.Windows.Controls.TextBox;
+                            var tb = Panel.Children[1] as System.Windows.Controls.TextBox;
                             custom.Handler(custom, tb!.Text, ref script, ref custom_env);
                         }
                     }
@@ -253,14 +255,14 @@ namespace OVChecker
                 {
                     if (list_item is ListBoxItem)
                     {
-                        apply_customization(((list_item as ListBoxItem)!.Content as Panel)!);
+                        apply_customization(((list_item as ListBoxItem)!.Content as Panel)!, ref forced_tools);
                         continue;
                     }
                     if (list_item is Expander)
                     {
                         foreach (var list_item2 in ((list_item as Expander)!.Content as Panel)!.Children)
                         {
-                            apply_customization(((list_item2 as ListBoxItem)!.Content as Panel)!);
+                            apply_customization(((list_item2 as ListBoxItem)!.Content as Panel)!, ref forced_tools);
                         }
                     }
                 }
@@ -268,7 +270,18 @@ namespace OVChecker
 
             System.IO.File.WriteAllText(script_path, script);
 
-            tasks.Add(new() { Name = python_path, Args = "\"" + script_path + "\"", WorkingDir = WorkDir, CustomEnvVars = custom_env, DontStopOnError = (CBFastFail.IsChecked == false), NoWindow = true, ItemSource = item, StatusHandler = ItemStatusHandler });
+            tasks.Add(new()
+            {
+                Name = python_path,
+                Args = "\"" + script_path + "\"",
+                WorkingDir = WorkDir,
+                CustomEnvVars = custom_env,
+                DontStopOnError = (CBFastFail.IsChecked == false),
+                NoWindow = true,
+                ItemSource = item,
+                StatusHandler = ItemStatusHandler,
+                ForcedTools = forced_tools,
+            });
         }
     }
 }

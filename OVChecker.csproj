@@ -19,6 +19,7 @@
 	  <None Remove="Resources\status_ok.bmp" />
 	  <None Remove="Resources\status_unknown.bmp" />
 	  <None Remove="Resources\warning.png" />
+	  <None Remove="Tools\GpuMemPool.py" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,6 +34,7 @@
 	  <Resource Include="Resources\status_ok.bmp" />
 	  <Resource Include="Resources\status_unknown.bmp" />
 	  <Resource Include="Resources\warning.png" />
+	  <EmbeddedResource Include="Tools\GpuMemPool.py" />
 	</ItemGroup>
 
 	<ItemGroup>

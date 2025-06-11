@@ -639,5 +639,11 @@ namespace OVChecker
             MatchesViewer matchesViewer = new MatchesViewer();
             matchesViewer.Show();
         }
+
+        private void ButtonGPUMemPool_Click(object sender, RoutedEventArgs e)
+        {
+            GPUMemPool gpuMemPool = new GPUMemPool();
+            gpuMemPool.Show();
+        }
     }
 }

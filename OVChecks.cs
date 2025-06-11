@@ -32,6 +32,9 @@ namespace OVChecker
         public CustomizationApplied? Handler { get; set; }
         public string GUID { get; set; }
         public string HelpURL { get; set; }
+        // Forces a tool buttons in AppOutput in case it is provided
+        // Could be a list, delimited by ";", after any modification must have ";" at the end
+        public string ForceTools { get; set; }
         public OVCheckCustomization()
         {
             Type = CustomizationType.Unknown;
@@ -40,6 +43,7 @@ namespace OVChecker
             Value = null;
             GUID = Guid.NewGuid().ToString();
             HelpURL = "";
+            ForceTools = "";
         }
     }
     public class OVCheckDescription

@@ -576,7 +576,7 @@ namespace OVChecker
                     return;
                 }
                 AppOutput app = new();
-                tasks.Add(new() { Name = python_path, Args = "-m pip list", WorkingDir = WorkDir, CustomEnvVars = custom_env, NoWindow = true });
+                tasks.Add(new() { Name = python_path, Args = "-m pip install " + TextPipInstall.Text, WorkingDir = WorkDir, CustomEnvVars = custom_env, NoWindow = true });
                 app.RunProcess("pip install " + TextPipInstall.Text, tasks, WorkDir + "pip.log");
             }
         }

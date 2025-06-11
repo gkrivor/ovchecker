@@ -577,7 +577,7 @@ namespace OVChecker
 #endif
                 List<AppOutput.ProcessItem> tasks = new();
                 tasks.Add(new() { Name = PythonPath, Args = "\"" + netron_path.Replace("\"", "\\\"") + "\\package.py\" build", WorkingDir = WorkDir, DontStopOnError = false, NoWindow = true });
-                tasks.Add(new() { Name = PythonPath, Args = "-m pip install \"" + netron_path.Replace("\"", "\\\"") + "\\dist\\pypi\" --upgrade", WorkingDir = WorkDir, DontStopOnError = false, NoWindow = true });
+                // tasks.Add(new() { Name = PythonPath, Args = "-m pip install \"" + netron_path.Replace("\"", "\\\"") + "\\dist\\pypi\" --upgrade", WorkingDir = WorkDir, DontStopOnError = false, NoWindow = true });
                 AppOutput app = new();
                 app.RunProcess("Netron installation", tasks, WorkDir + "netron.log");
                 ButtonOpenNetron.IsEnabled = IsNetronAvailable();

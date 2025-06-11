@@ -606,7 +606,7 @@ namespace OVChecker
                 {
                     NetronServer = new Process();
                     NetronServer.StartInfo.FileName = PythonPath;
-                    NetronServer.StartInfo.Arguments = "-c \"import netron; netron.main()\" -p 8001";
+                    NetronServer.StartInfo.Arguments = "-c \"import sys; sys.path.append(\\\"netron-main/dist/pypi\\\"); import netron; netron.main()\" -p 8001";
                     NetronServer.StartInfo.WorkingDirectory = WorkDir;
                     NetronServer.StartInfo.UseShellExecute = false;
                     NetronServer.StartInfo.RedirectStandardInput = true;

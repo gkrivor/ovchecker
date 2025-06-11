@@ -195,6 +195,29 @@ namespace OVChecker
                 if (bool.Parse(value!.ToString()!) != true) return;
                 AddEnvironmentVariable(ref script, "OV_VERBOSE", "\"4\"");
                 AddEnvironmentVariable(ref script, "OV_GPU_DUMP_MEMORY_POOL", "\"1\"");
+
+                const string keyword_bc = "# OnBeforeCheck";
+                var pos_bc = script.IndexOf(keyword_bc);
+                if (pos_bc == -1) { return; }
+                const string keyword_ac = "# OnAfterCheck";
+                var pos_ac = script.IndexOf(keyword_ac);
+                if (pos_ac == -1) { return; }
+
+                string script_end = script.Substring(pos_ac);
+                string[] check_lines = script.Substring(pos_bc + keyword_bc.Length, pos_ac - pos_bc - keyword_bc.Length).Split("\n");
+                script = script.Remove(pos_bc + keyword_bc.Length);
+                if (!script.EndsWith("\n")) script += "\n";
+
+                foreach (string line in check_lines)
+                {
+                    string safe_line = line.Trim().Replace("\"", "\\\"");
+                    if (safe_line.Length == 0 || safe_line.Contains("no-check")) continue;
+                    if (safe_line.Length > 64) safe_line = safe_line.Substring(0, 64) + "...";
+                    script += "print(\">>> Checkpoint: " + safe_line + "\", flush=True) # no-check\n";
+                    script += line.EndsWith("\n") ? line : line + "\n";
+                }
+
+                script += script_end;
             }
         };
         /* ------------------------------ CPU Plugin Specific Checks ------------------------------ */
@@ -323,6 +346,7 @@ namespace OVChecker
                 "m = ie.read_model(\"%MODEL_PATH%\")\n" +
                 "c = ie.compile_model(m, \"%DEVICE%\")\n" +
                 "m = None\n" +
+                "c = None\n" +
                 "# OnAfterCheck\n" +
                 "print(\">>> Done\")"
                 ));
@@ -342,6 +366,7 @@ namespace OVChecker
                 "m = ov.convert_model(\"%MODEL_PATH%\")\n" +
                 "c = ie.compile_model(m, \"%DEVICE%\")\n" +
                 "m = None\n" +
+                "c = None\n" +
                 "# OnAfterCheck\n" +
                 "print(\">>> Done\")"
                 ));

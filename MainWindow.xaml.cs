@@ -645,5 +645,31 @@ namespace OVChecker
             GPUMemPool gpuMemPool = new GPUMemPool();
             gpuMemPool.Show();
         }
+
+        private void ButtonRunExt_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is Button)) return;
+            string action = (sender as Button)!.Uid;
+            System.Diagnostics.Process process = new();
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.WorkingDirectory = WorkDir;
+            if (CBoxOpenVINOPath.SelectedItem != null && !(CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!.Content.ToString()!.ToLower().EndsWith(".whl"))
+            {
+                process.StartInfo.EnvironmentVariables["OPENVINO_LIB_PATHS"] = CBoxOpenVINOPath.Text;
+                process.StartInfo.EnvironmentVariables["PYTHONPATH"] = CBoxOpenVINOPath.Text + "python\\;" + CBoxOpenVINOPath.Text + "..\\..\\..\\tools\\ovc\\;";
+                process.StartInfo.EnvironmentVariables["PATH"] += ";" + CBoxOpenVINOPath.Text + ";" + CBoxOpenVINOPath.Text + "..\\..\\..\\temp\\tbb\\bin;";
+            }
+            if (action == "cmd")
+            {
+                process.StartInfo.FileName = "cmd.exe";
+                process.StartInfo.Arguments = "/K";
+            }
+            else if (action == "python")
+            {
+                process.StartInfo.FileName = PythonPath;
+            }
+            process.Start();
+        }
     }
 }

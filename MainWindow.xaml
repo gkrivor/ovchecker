@@ -43,15 +43,13 @@
                         </Expander>
                         <Expander Header="Tools" IsExpanded="True">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="67*"/>
-                                    <ColumnDefinition Width="121*"/>
-                                </Grid.ColumnDefinitions>
-                                <Button x:Name="ButtonOpenNetron" IsEnabled="False" Content="Open Netron" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="open"/>
-                                <Button x:Name="ButtonUpdateNetron" Content="Download Netron" Margin="366,0,0,0" VerticalAlignment="Center" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="update" Grid.Column="1"/>
-                                <Button x:Name="ButtonPassViewer" Content="Open PassViewer" Margin="10,35,10,0" VerticalAlignment="Top" Click="ButtonPassViewer_Click" HorizontalAlignment="Left" Width="108"/>
-                                <Button x:Name="ButtonMatchesViewer" Content="Open MatchesViewer" Margin="123,35,0,0" VerticalAlignment="Top" Click="ButtonMatchesViewer_Click" HorizontalAlignment="Left" Width="108"/>
-                                <Button x:Name="ButtonGPUMemPool" Content="Open GPUMemPool" Margin="236,35,0,0" VerticalAlignment="Top" Click="ButtonGPUMemPool_Click" HorizontalAlignment="Left" Width="140" Grid.ColumnSpan="2"/>
+                                <Button x:Name="ButtonRunCMD" Content="Open cmd.exe" Margin="10,10,0,0" VerticalAlignment="Top" Click="ButtonRunExt_Click" HorizontalAlignment="Left" Width="108" Uid="cmd"/>
+                                <Button x:Name="ButtonRunPython" Content="Open Python" Margin="123,10,0,0" VerticalAlignment="Top" Click="ButtonRunExt_Click" HorizontalAlignment="Left" Width="108" Uid="python"/>
+                                <Button x:Name="ButtonOpenNetron" IsEnabled="False" Content="Open Netron" Margin="10,35,0,0" VerticalAlignment="Top" Click="ButtonNetron_Click" HorizontalAlignment="Left" Width="108" Uid="open"/>
+                                <Button x:Name="ButtonUpdateNetron" Content="Download Netron" Margin="0,35,10,0" VerticalAlignment="Top" Click="ButtonNetron_Click" Uid="update" HorizontalAlignment="Right" Width="108"/>
+                                <Button x:Name="ButtonPassViewer" Content="Open PassViewer" Margin="10,60,10,0" VerticalAlignment="Top" Click="ButtonPassViewer_Click" HorizontalAlignment="Left" Width="108"/>
+                                <Button x:Name="ButtonMatchesViewer" Content="Open MatchesViewer" Margin="123,60,0,0" VerticalAlignment="Top" Click="ButtonMatchesViewer_Click" HorizontalAlignment="Left" Width="135"/>
+                                <Button x:Name="ButtonGPUMemPool" Content="Open GPUMemPool" Margin="263,60,0,0" VerticalAlignment="Top" Click="ButtonGPUMemPool_Click" HorizontalAlignment="Left" Width="140"/>
                             </Grid>
                         </Expander>
                     </StackPanel>

@@ -33,11 +33,19 @@ namespace OVChecker
             Value = "",
             Handler = (OVCheckCustomization source, object? value, ref string script, ref string custom_env) =>
             {
+                // @TODO: Add possibility to insert code with expected tabs
                 if (!(value is string) || value.ToString() == "") return;
-                const string keyword = "# OnAfterCheck";
-                var pos = script.IndexOf(keyword);
-                if (pos == -1) { return; }
+                const string m_None = "m = None";
+                var pos = script.IndexOf(m_None);
                 string str = "\nov.serialize(m, \"" + value + "\")\n";
+                if (pos != -1)
+                {
+                    script = script.Insert(pos, str.TrimStart());
+                    return;
+                }
+                const string keyword = "# OnAfterCheck";
+                pos = script.IndexOf(keyword);
+                if (pos == -1) { return; }
                 if (pos + keyword.Length < script.Length)
                     script = script.Insert(pos + keyword.Length + 1, str);
                 else

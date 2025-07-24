@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Xml;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace OVChecker
 {
@@ -110,7 +112,7 @@ namespace OVChecker
         /// <param name="DestPath">Path to a file where content should be stored</param>
         /// <param name="CallWithProxy">Indicates how should be made a request - with or without proxy, if applicable</param>
         /// <returns></returns>
-        public static bool DownloadFileSimple(string SourceURL, string DestPath, bool CallWithProxy = false)
+        public static bool DownloadFileSimple(string SourceURL, string DestPath, Action<int>? Progress = null, bool CallWithProxy = false)
         {
             var http_client_handler = new HttpClientHandler
             {
@@ -134,7 +136,25 @@ namespace OVChecker
                     {
                         using (var fs = new FileStream(DestPath, FileMode.OpenOrCreate))
                         {
-                            s.Result.CopyTo(fs);
+                            if (Progress == null)
+                            {
+                                s.Result.CopyTo(fs);
+                            }
+                            else
+                            {
+                                using (var ds = s.Result)
+                                {
+                                    byte[] buffer = new byte[2 * 1024];
+
+                                    int read, total = 0;
+                                    while ((read = ds.Read(buffer, 0, buffer.Length)) > 0)
+                                    {
+                                        fs.Write(buffer, 0, read);
+                                        total += read;
+                                        Progress(total);
+                                    }
+                                }
+                            }
                             return true;
                         }
                     }
@@ -158,13 +178,32 @@ namespace OVChecker
         /// </summary>
         /// <param name="SourceURL">URL to a source file</param>
         /// <param name="DestPath">Path to a file where content should be stored</param>
+        /// <param name="Progress">Callback called when next portion of data has been received</param>
+        /// <param name="FirstCallWithProxy">Indicates how should be made a first request - with or without proxy, if applicable</param>
+        /// <returns></returns>
+        public static bool DownloadFile(string SourceURL, string DestPath, Action<int>? Progress = null, bool FirstCallWithProxy = false)
+        {
+            if (DownloadFileSimple(SourceURL, DestPath, Progress, FirstCallWithProxy))
+                return true;
+            return DownloadFileSimple(SourceURL, DestPath, Progress, !FirstCallWithProxy);
+        }
+        /// <summary>
+        /// Method tries to download file from specified URL and returns true if file saved to DestPath.
+        /// Method gets a proxy config from environment variables:
+        /// HTTP_PROXY - for urls started with http:
+        /// HTTPS_PROXY - for urls started with https:
+        /// It tries to achieve file with or without proxy (how file should be achieved at first call -
+        /// specified by a corresponding argument).
+        /// </summary>
+        /// <param name="SourceURL">URL to a source file</param>
+        /// <param name="DestPath">Path to a file where content should be stored</param>
         /// <param name="FirstCallWithProxy">Indicates how should be made a first request - with or without proxy, if applicable</param>
         /// <returns></returns>
         public static bool DownloadFile(string SourceURL, string DestPath, bool FirstCallWithProxy = false)
         {
-            if (DownloadFileSimple(SourceURL, DestPath, FirstCallWithProxy))
+            if (DownloadFileSimple(SourceURL, DestPath, null, FirstCallWithProxy))
                 return true;
-            return DownloadFileSimple(SourceURL, DestPath, !FirstCallWithProxy);
+            return DownloadFileSimple(SourceURL, DestPath, null, !FirstCallWithProxy);
         }
     }
 }

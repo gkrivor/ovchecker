@@ -103,6 +103,14 @@ namespace OVChecker
                 }
                 if (Assembly.GetExecutingAssembly().GetName().Version < LatestVersion)
                 {
+                    MainWindow.instance!.Dispatcher.Invoke(() =>
+                    {
+                        if (MainWindow.instance != null)
+                        {
+                            MainWindow.instance.ButtonNewVersion.Content = "New version available: " + LatestVersion;
+                            MainWindow.instance.ButtonNewVersion.Visibility = System.Windows.Visibility.Visible;
+                        }
+                    });
                     try
                     {
                         string app_path = AppDomain.CurrentDomain.BaseDirectory.Replace("/", "\\");
@@ -135,7 +143,19 @@ namespace OVChecker
                         }
                         if (!System.IO.File.Exists(update_archive))
                         {
-                            if (!WebRequest.DownloadFile(AvailableVersions[LatestVersion], update_archive)) continue;
+                            var update_progress = (int total) =>
+                            {
+                                MainWindow.instance!.Dispatcher.Invoke(() =>
+                                {
+                                    if (MainWindow.instance != null)
+                                    {
+                                        MainWindow.instance.LabelUpdateProgress.Content = "Downloading update: " + (total / (1024 * 1024)).ToString("0.00") + "Mb";
+                                        MainWindow.instance.LabelUpdateProgress.Visibility = System.Windows.Visibility.Visible;
+                                    }
+                                });
+                            };
+
+                            if (!WebRequest.DownloadFile(AvailableVersions[LatestVersion], update_archive, update_progress)) continue;
                             if (VersionsHash.ContainsKey(LatestVersion) && VersionsHash[LatestVersion] != GetFileHash(update_archive))
                             {
                                 try
@@ -156,7 +176,7 @@ namespace OVChecker
                         }
                         if (System.IO.Directory.Exists(update_path) && MainWindow.instance != null)
                         {
-                            MainWindow.instance.Dispatcher.Invoke(new(() => { if (MainWindow.instance != null) MainWindow.instance.ShowButtonUpdate(); }));
+                            MainWindow.instance.Dispatcher.Invoke(new(() => {if (MainWindow.instance != null) MainWindow.instance.ShowButtonUpdate(); }));
                         }
                     }
                     catch

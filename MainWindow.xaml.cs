@@ -98,6 +98,9 @@ namespace OVChecker
             }
             */
             ShowApplicableChecks();
+            ButtonUpdate.Visibility = Visibility.Hidden;
+            ButtonNewVersion.Visibility = Visibility.Hidden;
+            LabelUpdateProgress.Visibility = Visibility.Hidden;
             UpdateChecker.CheckUpdates();
             UpdateAboutTab();
             SplashScreen.CloseWindow();
@@ -112,6 +115,8 @@ namespace OVChecker
         public void ShowButtonUpdate()
         {
             ButtonUpdate.Visibility = Visibility.Visible;
+            LabelUpdateProgress.Visibility = Visibility.Hidden;
+            ButtonNewVersion.Visibility = Visibility.Hidden;
         }
         public void DetectFrontend()
         {

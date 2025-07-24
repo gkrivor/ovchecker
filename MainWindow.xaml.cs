@@ -541,23 +541,10 @@ namespace OVChecker
                 string python_path = WorkDir + item.Path;
                 if (item.Content.ToString()!.StartsWith("Download "))
                 {
-                    string python_achive = python_path + ".zip";
-                    if (!System.IO.File.Exists(python_achive))
+                    string python_archive = python_path + ".zip";
+                    if (!System.IO.File.Exists(python_archive))
                     {
-                        try
-                        {
-                            using (var client = new HttpClient())
-                            {
-                                using (var s = client.GetStreamAsync(item.URL))
-                                {
-                                    using (var fs = new FileStream(python_achive, FileMode.OpenOrCreate))
-                                    {
-                                        s.Result.CopyTo(fs);
-                                    }
-                                }
-                            }
-                        }
-                        catch
+                        if (!WebRequest.DownloadFile(item.URL, python_archive, true))
                         {
                             System.Windows.MessageBox.Show("Download failed, please download file " + item.URL + " manually and store as " + item.Path + ".zip in Work Dir");
                             return;
@@ -565,27 +552,14 @@ namespace OVChecker
                     }
                     if (!System.IO.Directory.Exists(python_path))
                     {
-                        System.IO.Compression.ZipFile.ExtractToDirectory(python_achive, python_path);
+                        System.IO.Compression.ZipFile.ExtractToDirectory(python_archive, python_path);
                     }
                     item.Content = item.Content.ToString()!.Replace("Download ", "");
                     string pip_archive = WorkDir + "pip.pyz";
                     if (!System.IO.File.Exists(pip_archive))
                     {
                         string pip_installer = "https://bootstrap.pypa.io/pip/pip.pyz";
-                        try
-                        {
-                            using (var client = new HttpClient())
-                            {
-                                using (var s = client.GetStreamAsync(pip_installer))
-                                {
-                                    using (var fs = new FileStream(pip_archive, FileMode.OpenOrCreate))
-                                    {
-                                        s.Result.CopyTo(fs);
-                                    }
-                                }
-                            }
-                        }
-                        catch
+                        if (!WebRequest.DownloadFile(pip_installer, pip_archive, true))
                         {
                             System.Windows.MessageBox.Show("Download failed, please download file " + pip_installer + " manually and store as pip.pyz in Work Dir");
                             return;
@@ -985,31 +959,22 @@ namespace OVChecker
             {
                 return;
             }
-            try
-            {
-                var httpClientHandler = new HttpClientHandler
-                {
-                    Proxy = null,
-                    UseProxy = false,
-                };
-                using (var client = new HttpClient(httpClientHandler, false))
-                {
-                    using (var s = client.GetStreamAsync(url))
-                    {
-                        using (var fs = new FileStream(WorkDir + filename, FileMode.OpenOrCreate))
-                        {
-                            s.Result.CopyTo(fs);
-                        }
-                    }
-                }
-            }
-            catch
+            if (!WebRequest.DownloadFile(url, WorkDir + filename, true))
             {
                 System.Windows.MessageBox.Show("Download failed, please download file manually and store as " + filename + " in Work Dir");
                 return;
             }
             MessageBox.Show("Wheel has been downloaded!", "Download Complete", MessageBoxButton.OK, MessageBoxImage.Information);
             SelectOrAddComboBoxItem(CBoxOpenVINOPath, WorkDir + filename);
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            UpdateChecker.Stop();
+            foreach (var wnd in Application.Current.Windows)
+            {
+                (wnd as Window)!.Close();
+            }
         }
     }
 }

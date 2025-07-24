@@ -55,60 +55,44 @@ namespace OVChecker
         private void CheckUpdatesThreadProc()
         {
             bool first_attempt = true;
-            var httpClientHandler = new HttpClientHandler
-            {
-                Proxy = null,
-                UseProxy = false,
-            };
-
-            if (Properties.Settings.Default.UpdateProxy != "")
-            {
-                httpClientHandler.Proxy = new WebProxy(Properties.Settings.Default.UpdateProxy);
-                httpClientHandler.UseProxy = true;
-            }
 
             while (!IsCheckUpdatesCompleted)
             {
+                if (ThreadStop) break;
                 if (!first_attempt)
-                    System.Threading.Thread.Sleep(30000);
+                    try
+                    {
+                        System.Threading.Thread.Sleep(30000);
+                    }
+                    catch { }
                 else
                     first_attempt = false;
+                if (ThreadStop) break;
                 try
                 {
-                    using (var client = new HttpClient(httpClientHandler, false))
+                    MemoryStream? ms = WebRequest.GetMemoryStream(Properties.Settings.Default.UpdateURL);
+                    if (ms == null) continue;
+                    XmlDocument xml = new();
+                    xml.Load(ms);
+                    var doc = xml.DocumentElement;
+                    if (doc == null) continue;
+                    var latest = doc.GetElementsByTagName("latest");
+                    if (latest != null && latest.Count > 0)
                     {
-                        if (ThreadStop) return;
-                        using (var s = client.GetStreamAsync(Properties.Settings.Default.UpdateURL))
+                        LatestVersion = new(latest[0]!.FirstChild!.Value!);
+                    }
+                    AvailableVersions.Clear();
+                    var available = doc.GetElementsByTagName("available");
+                    if (available != null && available.Count > 0)
+                    {
+                        foreach (var version in available[0]!.ChildNodes)
                         {
-                            if (ThreadStop) return;
-                            using (var ms = new MemoryStream())
+                            if (!(version is XmlElement)) continue;
+                            var item = (version as XmlElement)!;
+                            AvailableVersions[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[1]!.Value;
+                            if (item.Attributes.Count > 2)
                             {
-                                s.Result.CopyTo(ms);
-                                ms.Seek(0, SeekOrigin.Begin);
-                                XmlDocument xml = new();
-                                xml.Load(ms);
-                                var doc = xml.DocumentElement;
-                                if (doc == null) continue;
-                                var latest = doc.GetElementsByTagName("latest");
-                                if (latest != null && latest.Count > 0)
-                                {
-                                    LatestVersion = new(latest[0]!.FirstChild!.Value!);
-                                }
-                                AvailableVersions.Clear();
-                                var available = doc.GetElementsByTagName("available");
-                                if (available != null && available.Count > 0)
-                                {
-                                    foreach (var version in available[0]!.ChildNodes)
-                                    {
-                                        if (!(version is XmlElement)) continue;
-                                        var item = (version as XmlElement)!;
-                                        AvailableVersions[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[1]!.Value;
-                                        if (item.Attributes.Count > 2)
-                                        {
-                                            VersionsHash[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[2]!.Value.ToLowerInvariant();
-                                        }
-                                    }
-                                }
+                                VersionsHash[new System.Version(item.Attributes[0]!.Value)] = item.Attributes[2]!.Value.ToLowerInvariant();
                             }
                         }
                     }
@@ -151,28 +135,17 @@ namespace OVChecker
                         }
                         if (!System.IO.File.Exists(update_archive))
                         {
-                            using (var client = new HttpClient(httpClientHandler, false))
+                            if (!WebRequest.DownloadFile(AvailableVersions[LatestVersion], update_archive)) continue;
+                            if (VersionsHash.ContainsKey(LatestVersion) && VersionsHash[LatestVersion] != GetFileHash(update_archive))
                             {
-                                if (ThreadStop) return;
-                                using (var s = client.GetStreamAsync(AvailableVersions[LatestVersion]))
+                                try
                                 {
-                                    if (ThreadStop) return;
-                                    using (var fs = new FileStream(update_archive, FileMode.OpenOrCreate))
-                                    {
-                                        s.Result.CopyTo(fs);
-                                    }
-                                    if (VersionsHash.ContainsKey(LatestVersion) && VersionsHash[LatestVersion] != GetFileHash(update_archive))
-                                    {
-                                        try
-                                        {
-                                            System.IO.File.Delete(update_archive);
-                                            System.IO.Directory.Delete(update_path, true);
-                                        }
-                                        catch
-                                        {
-                                            continue;
-                                        }
-                                    }
+                                    System.IO.File.Delete(update_archive);
+                                    System.IO.Directory.Delete(update_path, true);
+                                }
+                                catch
+                                {
+                                    continue;
                                 }
                             }
                         }

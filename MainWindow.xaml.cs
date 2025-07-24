@@ -171,6 +171,11 @@ namespace OVChecker
             instance = this;
             SplashScreen.ShowWindow();
             InitializeComponent();
+            if (Properties.Settings.Default.IsUpgraded == false)
+            {
+                Properties.Settings.Default.Upgrade();
+            }
+            Properties.Settings.Default.IsUpgraded = true;
             OVChecksRegistry.RegisterChecks();
             ListViewChecks.ItemsSource = OVChecks;
             if (Properties.Settings.Default.WorkDirs != null)

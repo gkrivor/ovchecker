@@ -150,5 +150,28 @@ namespace OVChecker.Properties {
                 this["IsUpgraded"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string PytestsPath {
+            get {
+                return ((string)(this["PytestsPath"]));
+            }
+            set {
+                this["PytestsPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection PytestsPaths {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["PytestsPaths"]));
+            }
+            set {
+                this["PytestsPaths"] = value;
+            }
+        }
     }
 }

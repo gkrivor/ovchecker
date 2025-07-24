@@ -111,6 +111,69 @@
                     <ListBox x:Name="ListChecksCustomizations" Margin="0,63,10,49" HorizontalAlignment="Right" Width="301"/>
                 </Grid>
             </TabItem>
+            <TabItem Header="Pytests" x:Name="TabPytests">
+                <Grid>
+                    <Label Content="Pytests:" HorizontalAlignment="Left" Height="27" Margin="10,6,0,0" VerticalAlignment="Top" Width="71"/>
+                    <ComboBox x:Name="CBoxPytestsPath" Margin="86,10,226,0" Text="" Height="20" VerticalAlignment="Top" SelectionChanged="CBoxPytestsPath_SelectionChanged"/>
+                    <Button Content="Browse file..." Margin="0,10,120,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="101" Click="ButtonBrowsePytestsPath_Click"/>
+                    <Button Content="Browse folder..." Margin="0,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="101" Click="ButtonBrowsePytestsFolder_Click"/>
+                    <Button Content="Refresh List" Margin="0,38,120,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="101" Click="ButtonRefreshPytests_Click" ToolTip="Refresh list of tests using selected source and with applied -k filter if provided"/>
+                    <Button Content="Open folder..." Margin="0,38,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="101" ToolTip="Open selected folder or folder with selected file"/>
+                    <ListView x:Name="ListViewPytests" Margin="0,87,316,49">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Selected}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Name">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Status">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Source="{Binding StatusIcon}" Width="16" Height="16"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Run">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Uid="{Binding GUID}" Click="ButtonSinglePytestRun_Click" ToolTip="Run only selected check">
+                                                <Image Source="Resources/run.png" Width="16" Height="16"/>
+                                            </Button>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <CheckBox x:Name="CBFastFailPytests" Margin="10,0,0,7" Content="Fast Fail" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="71"/>
+                    <Button HorizontalAlignment="Left" Margin="86,0,0,12" Height="20" VerticalAlignment="Bottom" Click="ButtonRunSelectedPytests_Click">
+                        <WrapPanel>
+                            <Image Source="/Resources/run_m.png" Width="16" Height="16" Margin="0,0,6,0"/>
+                            <TextBlock Text="Run Selected"/>
+                        </WrapPanel>
+                    </Button>
+                    <Button Content="Select All" HorizontalAlignment="Left" Margin="11,62,0,0" Height="20" VerticalAlignment="Top" Width="64" Click="ButtonSelectPytests_Click"/>
+                    <Button Content="Select None" HorizontalAlignment="Left" Margin="157,62,0,0" Height="20" VerticalAlignment="Top" Width="72" Click="ButtonSelectPytests_Click" Uid="None"/>
+                    <Button Content="Reset status" HorizontalAlignment="Left" Margin="80,62,0,0" Height="20" VerticalAlignment="Top" Width="72" Click="ButtonSelectPytests_Click" Uid="Status"/>
+                    <Label Content="Customizations:" Margin="0,59,217,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="94"/>
+                    <ListBox x:Name="ListPytestsCustomizations" Margin="0,90,10,49" HorizontalAlignment="Right" Width="301"/>
+                    <Label Content="-k" HorizontalAlignment="Left" Margin="60,35,0,0" VerticalAlignment="Top" ToolTip="Pytest filtering"/>
+                    <TextBox x:Name="TextPytestFilter" Margin="86,39,226,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
             <TabItem Header="About">
                 <Grid>
                     <Label Content="OV Checker" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="22" Margin="10,10,0,0"/>

@@ -45,6 +45,7 @@ namespace OVChecker
             Properties.Settings.Default.IsUpgraded = true;
             OVChecksRegistry.RegisterChecks();
             ListViewChecks.ItemsSource = OVChecks;
+            ListViewPytests.ItemsSource = Pytests;
             if (Properties.Settings.Default.WorkDirs != null)
             {
                 foreach (var item in Properties.Settings.Default.WorkDirs)
@@ -82,6 +83,20 @@ namespace OVChecker
                 SelectOrAddComboBoxItem(CBoxModelPath, Properties.Settings.Default.ModelPath);
                 DetectFrontend();
             }
+            if (Properties.Settings.Default.PytestsPaths != null)
+            {
+                foreach (var item in Properties.Settings.Default.PytestsPaths)
+                {
+                    CBoxPytestsPath.Items.Add(new ComboBoxItem() { Content = item });
+                }
+            }
+            /*
+            // Need to think - is it necessary to choose it on run?..
+            if (Properties.Settings.Default.PytestsPath != "")
+            {
+                SelectOrAddComboBoxItem(CBoxPytestsPath, Properties.Settings.Default.PytestsPath);
+            }
+            */
             ShowApplicableChecks();
             UpdateChecker.CheckUpdates();
             UpdateAboutTab();
@@ -264,11 +279,11 @@ namespace OVChecker
             if (string.IsNullOrEmpty(ModelPath)) { return; }
             if (System.IO.File.Exists(ModelPath))
             {
-                System.Diagnostics.Process.Start("explorer.exe", "/select,\"" +ModelPath.Replace("\"", "\\\"") + "\"");
+                System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + ModelPath.Replace("\"", "\\\"") + "\"");
             }
             else if (System.IO.Directory.Exists(ModelPath))
             {
-                System.Diagnostics.Process.Start("explorer.exe", "\""+ModelPath.Replace("\"", "\\\"") + "\"");
+                System.Diagnostics.Process.Start("explorer.exe", "\"" + ModelPath.Replace("\"", "\\\"") + "\"");
             }
         }
 
@@ -305,7 +320,7 @@ namespace OVChecker
 
         private void TabTools_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TabTools.SelectedIndex == 1)
+            if (TabTools.SelectedIndex == 1 || TabTools.SelectedIndex == 2)
             {
                 if (WorkDir == "")
                 {
@@ -381,6 +396,118 @@ namespace OVChecker
             {
                 (wnd as Window)!.Close();
             }
+        }
+
+        private void ButtonBrowsePytestsPath_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog openDialog = new()
+            {
+                Filter = "Python files with tests|*.py|All files (*.*)|*.*",
+                DefaultExt = "*.py"
+            };
+
+            var result = openDialog.ShowDialog();
+            if (result != System.Windows.Forms.DialogResult.OK) return;
+
+            SelectOrAddComboBoxItem(CBoxPytestsPath, openDialog.FileName.Replace("/", "\\"));
+        }
+
+        private void ButtonBrowsePytestsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog openDialog = new() {
+                Description = "Select a folder for Pytests lookup",
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = true
+            };
+
+            var result = openDialog.ShowDialog();
+            if (result != System.Windows.Forms.DialogResult.OK) return;
+
+            SelectOrAddComboBoxItem(CBoxPytestsPath, openDialog.SelectedPath.Replace("/", "\\"));
+        }
+
+        private void CBoxPytestsPath_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CBoxPytestsPath.SelectedItem is ComboBoxItem)
+            {
+                PytestsPath = (CBoxPytestsPath.SelectedItem as ComboBoxItem)!.Content.ToString()!;
+                ShowApplicablePytests();
+            }
+        }
+
+        private void ButtonRefreshPytests_Click(object sender, RoutedEventArgs e)
+        {
+            if (CBoxPytestsPath.SelectedItem is ComboBoxItem)
+            {
+                PytestsPath = (CBoxPytestsPath.SelectedItem as ComboBoxItem)!.Content.ToString()!;
+                ShowApplicablePytests();
+            }
+        }
+
+        private void ButtonSelectPytests_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button)
+            {
+                if ((sender as System.Windows.Controls.Button)!.Uid == "None")
+                {
+                    foreach (var item in Pytests)
+                        item.Selected = false;
+                }
+                else if ((sender as System.Windows.Controls.Button)!.Uid == "Status")
+                {
+                    foreach (var item in Pytests)
+                        item.Status = "unknown";
+                }
+                else
+                {
+                    foreach (var item in Pytests)
+                        item.Selected = true;
+                }
+                CollectionViewSource.GetDefaultView(Pytests).Refresh();
+            }
+        }
+
+        private void ButtonSinglePytestRun_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(sender is System.Windows.Controls.Button)) { return; }
+
+            List<AppOutput.ProcessItem> tasks = new();
+
+            string python_path = PythonPath;
+            string? custom_env = null;
+
+            PrepareEnvironment(tasks, python_path, ref custom_env);
+            var item = GetPytestItemByGUID((sender as System.Windows.Controls.Button)!.Uid);
+            PreparePytest(item!, tasks, python_path, custom_env);
+
+            if (tasks.Count <= 0) return;
+
+            AppOutput app = new();
+            app.RunProcess("Single Test: " + item.Name, tasks, WorkDir + "latest.log");
+        }
+
+        private void ButtonRunSelectedPytests_Click(object sender, RoutedEventArgs e)
+        {
+            List<AppOutput.ProcessItem> tasks = new();
+
+            string python_path = PythonPath;
+            string? custom_env = null;
+
+            PrepareEnvironment(tasks, python_path, ref custom_env);
+
+            for (int i = 0; i < Pytests.Count; i++)
+            {
+                var item = Pytests[i]!;
+
+                if (item.Selected == false) continue;
+
+                PreparePytest(item, tasks, python_path, custom_env);
+            }
+
+            if (tasks.Count <= 0) return;
+
+            AppOutput app = new();
+            app.RunProcess("Pytest: " + PytestsPath, tasks, WorkDir + "latest.log");
         }
     }
 }

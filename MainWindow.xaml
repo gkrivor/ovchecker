@@ -116,8 +116,8 @@
                     <Label Content="OV Checker" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="22" Margin="10,10,0,0"/>
                     <Label x:Name="LabelVersion" Content="Version: 1.0" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,49,0,0"/>
                     <Label Content="Author: Krivoruchko, Georgy" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0"/>
-                    <Button x:Name="ButtonBugReport" Content="Report a bug" ToolTip="Opens default mail agent to report a bug" Margin="0,41,125,0" VerticalAlignment="Top" Uid="mailto:landgraph@gmail.com?subject=OV Checker" Click="LinkButton_Click" HorizontalAlignment="Right" Width="110"/>
-                    <Button x:Name="ButtonFeatureRequest" Content="Request a feature" ToolTip="Opens default mail agent to make a feature request" HorizontalAlignment="Right" Margin="0,41,10,0" VerticalAlignment="Top" Width="110"  Uid="mailto:landgraph@gmail.com?subject=OV Checker" Click="LinkButton_Click"/>
+                    <Button x:Name="ButtonBugReport" Content="Report a bug" ToolTip="Opens default mail agent to report a bug" Margin="0,41,125,0" VerticalAlignment="Top" Uid="mailto:landgraph@gmail.com?subject=[BUG] OV Checker" Click="LinkButton_Click" HorizontalAlignment="Right" Width="110"/>
+                    <Button x:Name="ButtonFeatureRequest" Content="Request a feature" ToolTip="Opens default mail agent to make a feature request" HorizontalAlignment="Right" Margin="0,41,10,0" VerticalAlignment="Top" Width="110"  Uid="mailto:landgraph@gmail.com?subject=[FTR] OV Checker" Click="LinkButton_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>

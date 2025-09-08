@@ -86,7 +86,7 @@ namespace OVChecker.Tools
                 }
                 if (n_pos == -1 && is_last_block && src_text.Length > 1) n_pos = src_text.Length;
                 if (n_pos == -1) break; // Read next block of text if new line isn't found
-                string line = src_text.ToString(0, n_pos - 1);
+                string line = src_text.ToString(0, n_pos);
                 src_text.Remove(0, n_pos < src_text.Length ? n_pos + 1 : src_text.Length - 1);
                 if (line.StartsWith("PassManager started:"))
                 {
@@ -115,7 +115,7 @@ namespace OVChecker.Tools
                 }
                 else if (line.StartsWith("                         "))
                 {
-                    var match = Regex.Match(line.Substring(25), @"([^ ]+)\s*([0-9]+)ms\s*([+-])");
+                    var match = Regex.Match(line.Substring(25), @"\s*([^ ]+)\s*([0-9]+)ms\s*([+-])");
                     if (match.Success)
                     {
                         var local_pass_path = string.Join(" \\ ", pass_path);

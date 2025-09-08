@@ -589,7 +589,7 @@ namespace OVChecker
 
             if (action == "open")
             {
-                if(!IsNetronAvailable())
+                if (!IsNetronAvailable())
                 {
                     MessageBox.Show("Netron isn\'t detected, press \"Download Netron\" button to download and install Netron for the chosen Python");
                     ButtonOpenNetron.IsEnabled = false;
@@ -613,7 +613,7 @@ namespace OVChecker
                     NetronServer.StartInfo.CreateNoWindow = true;
                     NetronServer.Start();
                     System.Threading.Thread.Sleep(200);
-                    if(NetronServer.HasExited)
+                    if (NetronServer.HasExited)
                     {
                         MessageBox.Show("Something wrong went with starting Netron. You may need to reboot your PC.");
                         NetronServer = null;
@@ -654,7 +654,7 @@ namespace OVChecker
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = false;
             process.StartInfo.WorkingDirectory = WorkDir;
-            if (CBoxOpenVINOPath.SelectedItem != null && !(CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!.Content.ToString()!.ToLower().EndsWith(".whl"))
+            if (CBoxOpenVINOPath.SelectedItem != null && !(CBoxOpenVINOPath.SelectedItem is ComboBoxOpenVINOItem) && !(CBoxOpenVINOPath.SelectedItem as ComboBoxItem)!.Content.ToString()!.ToLower().EndsWith(".whl"))
             {
                 process.StartInfo.EnvironmentVariables["OPENVINO_LIB_PATHS"] = CBoxOpenVINOPath.Text;
                 process.StartInfo.EnvironmentVariables["PYTHONPATH"] = CBoxOpenVINOPath.Text + "python\\;" + CBoxOpenVINOPath.Text + "..\\..\\..\\tools\\ovc\\;";

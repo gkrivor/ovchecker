@@ -111,6 +111,48 @@ namespace OVChecker
             UpdateChecker.CheckUpdates();
             UpdateAboutTab();
             SplashScreen.CloseWindow();
+            CheckEnvVarsInconsistency();
+        }
+        public void CheckEnvVarsInconsistency()
+        {
+            string? var_val = null;
+            string[] vars = ["OPENVINO_LIB_PATHS", "PYTHONPATH"];
+            foreach (var var_name in vars)
+            {
+                if ((var_val = Environment.GetEnvironmentVariable(var_name)) != null)
+                {
+                    if (MessageBox.Show("Environment variables has an " + var_name + " variable with content:\n" + var_val!
+                                        + "\n\nIt may affect further execution. Remove it for current session*?"
+                                        + "\n\n* - if you don't want to get this message - remove " + var_name + " from system's/user's environment variables",
+                        "Environment Settings issue", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    {
+                        Environment.SetEnvironmentVariable(var_name, null);
+                    }
+                }
+            }
+            if ((var_val = Environment.GetEnvironmentVariable("PATH")) != null && var_val.Contains("openvino", StringComparison.InvariantCultureIgnoreCase))
+            {
+                List<string> paths = new List<string>();
+                string cleanup_path = "";
+                foreach (var path_line in var_val.Split(";"))
+                {
+                    if (path_line.Contains("openvino", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        paths.Add(path_line);
+                        continue;
+                    }
+                    cleanup_path += path_line + ";";
+                }
+                if (paths.Count > 0 &&
+                    MessageBox.Show("Environment variable PATH contains a path(s) which might be related to an OpenVINO:\n"
+                                    + String.Join("\n", paths)
+                                    + "\n\nIt may affect further execution. Remove it for current session*?"
+                                    + "\n\n* - if you don't want to get this message - remove mentioned path from system's/user's PATH variable",
+                    "Possible OpenVINO path", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    Environment.SetEnvironmentVariable("PATH", cleanup_path);
+                }
+            }
         }
         public void UpdateAboutTab()
         {
